@@ -18,11 +18,19 @@ repositories {
 }
 
 dependencies {
+	// Spring Boot Starter
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	// Lombok
+	implementation 'org.projectlombok:lombok:1.18.30'
+	annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+	// JUnit & Test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
 }
 
-tasks.named('test') {
+tasks.test {
 	useJUnitPlatform()
 }
