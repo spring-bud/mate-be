@@ -1,0 +1,30 @@
+server:
+  shutdown: graceful
+
+spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 5s
+
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/mate-local-db
+    username: mate-local-user
+    password: mate-local-password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
+    open-in-view: false
+
+logging:
+  level:
+    org.hibernate.SQL: debug
