@@ -5,7 +5,7 @@ import java.util.UUID;
 public class DefaultNicknamePolicy {
 
     private static final int RANDOM_LENGTH = 8;
-    private static final String PREFIX = "DAO-";
+    private static final String PREFIX = "MATE";
 
     public static String generatedRandomString() {
         String randomString = generatedSubStringUUID();
