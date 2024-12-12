@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql:8.3.0
+    container_name: mate-mysql8
+    restart: always
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_USER: mate-local-user
+      MYSQL_PASSWORD: mate-local-password
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mate-local-db
+      TZ: 'Asia/Seoul'
+    volumes:
+      - mate-mysqldb:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  mate-mysqldb:
+
+networks:
+  mate-backend-network:
+    external: true
