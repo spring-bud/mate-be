@@ -21,12 +21,60 @@ spring:
   jpa:
     #    hibernate:
     #      ddl-auto: create
+    database-platform: org.hibernate.dialect.MySQL8Dialect
     properties:
       hibernate:
         format_sql: true
         highlight_sql: true
     open-in-view: false
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      repositories:
+        enabled: false
+
+  config:
+    import: optional:file:.env[.properties]
+
+  cookie:
+    maxage: 604800
+    path: /
+    samesite: Lax
+    domain: localhost
+    secure: false
+    http-only: true
+
+  security:
+    oauth2:
+      success-redirect: http://localhost:5173
+      client:
+        registration:
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
+            client-authentication-method: client_secret_post
+            redirect-uri: http://localhost:8080/login/oauth2/code/kakao
+            authorization-grant-type: authorization_code
+            client-name: kakao
+            scope:
+              - profile_nickname
+              - profile_image
+              - account_email
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+
 logging:
   level:
     org.hibernate.SQL: debug
+
+security:
+  jwt:
+    secret-key: ${JWT_SECRET}
+    access-expired: 604800
+    refresh-expired: 604800
