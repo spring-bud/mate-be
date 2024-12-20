@@ -3,10 +3,13 @@ package com.example.mate.auth.application;
 import com.example.mate.auth.application.dto.TokenResponseDto;
 import com.example.mate.auth.domain.Token;
 import com.example.mate.auth.domain.repository.TokenRepository;
+import com.example.mate.auth.exception.AuthException;
 import com.example.mate.user.application.UserService;
 import com.example.mate.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import static com.example.mate.auth.exception.AuthExceptionType.INVALID_TOKEN;
 
 @Service
 @RequiredArgsConstructor
@@ -16,7 +19,6 @@ public class AuthService {
     private final TokenProvider tokenProvider;
     private final TokenExtractor tokenExtractor;
     private final TokenRepository tokenRepository;
-
 
     public TokenResponseDto loginOrRegister(String oAuthId) {
         User findUser = userService.getOrRegisterByOAuthId(oAuthId);
@@ -30,5 +32,35 @@ public class AuthService {
         String accessToken = tokenProvider.generatedAccessToken(newToken.getUserId());
         String refreshToken = tokenProvider.generatedRefreshToken(newToken.getTokenId());
         return TokenResponseDto.of(accessToken, refreshToken);
+    }
+
+    public TokenResponseDto reissueTokenPair(String currentToken) {
+        String tokenId = tokenExtractor.extractRefreshToken(currentToken);
+
+        Token findToken = tokenRepository.findByTokenId(tokenId)
+                .orElseThrow(() -> new AuthException(INVALID_TOKEN));
+
+        tokenRepository.deleteByTokenId(findToken.getTokenId());
+
+        Token newToken = Token.builder()
+                .userId(findToken.getUserId())
+                .build();
+
+        tokenRepository.save(newToken);
+
+        String accessToken = tokenProvider.generatedAccessToken(newToken.getUserId());
+        String refreshToken = tokenProvider.generatedRefreshToken(newToken.getTokenId());
+        return TokenResponseDto.of(accessToken, refreshToken);
+    }
+
+    public void logout(Long userId, String currentToken) {
+        String tokenId = tokenExtractor.extractRefreshToken(currentToken);
+
+        Token findToken = tokenRepository.findByTokenId(tokenId)
+                .orElseThrow(() -> new AuthException(INVALID_TOKEN));
+
+        findToken.isMatchOrElseThrow(userId);
+
+        tokenRepository.deleteByTokenId(findToken.getTokenId());
     }
 }
