@@ -10,7 +10,7 @@ public class AuthHeaderExtractor {
     private static final String BEARER_PREFIX = "Bearer";
 
     public static Optional<String> extract(HttpServletRequest request) {
-        // HTTP 요청에서 "Authorization" 헤더 값을 가져옵니다.
+        
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (
                 StringUtils.hasText(header) &&
