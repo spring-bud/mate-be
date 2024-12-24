@@ -9,7 +9,7 @@ public class JwtProperties {
 
     private String secretKey;
     private Long accessExpired;
-    private Long refreshExpire;
+    private Long refreshExpired;
 
     public String getSecretKey() {
         return secretKey;
@@ -27,11 +27,11 @@ public class JwtProperties {
         this.accessExpired = accessExpired;
     }
 
-    public Long getRefreshExpire() {
-        return refreshExpire;
+    public Long getRefreshExpired() {
+        return refreshExpired;
     }
 
-    public void setRefreshExpire(Long refreshExpire) {
-        this.refreshExpire = refreshExpire;
+    public void setRefreshExpired(Long refreshExpired) {
+        this.refreshExpired = refreshExpired;
     }
 }

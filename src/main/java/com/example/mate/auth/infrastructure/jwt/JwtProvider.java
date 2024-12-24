@@ -36,7 +36,7 @@ public class JwtProvider implements TokenProvider {
     @Override
     public String generatedRefreshToken(String tokenId) {
         Claims claims = generatedClaims(TOKEN_ID, tokenId);
-        return generatedToken(claims, REFRESH_TOKEN, jwtProperties.getRefreshExpire());
+        return generatedToken(claims, REFRESH_TOKEN, jwtProperties.getRefreshExpired());
     }
 
     private Claims generatedClaims(String key, Object value) {
@@ -47,6 +47,7 @@ public class JwtProvider implements TokenProvider {
 
     private String generatedToken(Claims claims, String subject, Long exp) {
         long now = System.currentTimeMillis();
+        
         return Jwts.builder()
                 .setClaims(claims)                   //사용자 정의 데이터
                 .setSubject(subject)                 //jwt 소유자 사용자의 식별자로 사용된다
