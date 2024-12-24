@@ -15,38 +15,14 @@ public class CookieHandler {
 
     private final CookieProperties properties;
 
-    /**
-     * 쿠키를 생성합니다.
-     *
-     * @param cookieKey   쿠키의 키
-     * @param cookieValue 쿠키의 값
-     * @return 생성된 ResponseCookie 객체
-     * @author JiHongKim98
-     */
     public ResponseCookie createCookie(String cookieKey, String cookieValue) {
         return createCookieWithMaxAge(cookieKey, cookieValue, properties.getMaxAge());
     }
 
-    /**
-     * 지정된 만료 시간을 가진 쿠키를 생성합니다.
-     *
-     * @param cookieKey   쿠키의 키
-     * @param cookieValue 쿠키의 값
-     * @param maxAge      쿠키의 최대 수명 (초 단위)
-     * @return 생성된 ResponseCookie 객체
-     * @author JiHongKim98
-     */
     public ResponseCookie createCookie(String cookieKey, String cookieValue, Long maxAge) {
         return createCookieWithMaxAge(cookieKey, cookieValue, maxAge);
     }
 
-    /**
-     * 쿠키를 삭제합니다.
-     *
-     * @param cookieKey 삭제할 쿠키의 키
-     * @return 삭제를 위한 ResponseCookie 객체
-     * @author JiHongKim98
-     */
     public ResponseCookie deleteCookie(String cookieKey) {
         return createCookieWithMaxAge(cookieKey, DELETE_COOKIE_VALUE, DELETE_COOKIE_MAX_AGE);
     }
