@@ -56,7 +56,7 @@ spring:
 
   security:
     oauth2:
-      success-redirect: http://localhost:5173
+      success-redirect: ${KAKAO_SUCCESS_REDIRECT}
       client:
         registration:
           kakao:
