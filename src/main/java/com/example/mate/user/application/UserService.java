@@ -39,8 +39,6 @@ public class UserService {
     private User registerNewUserAndPublish(String oAuthId) {
         User newUser = User.builder().kakaoId(oAuthId).build();
         User saveUser = userRepository.save(newUser);
-        // TODO: 사용여부 확실하지 않음 - 민경준
-        //eventPublisher.publishEvent(UserCreateEvent.of(saveUser));
         return saveUser;
     }
 }
