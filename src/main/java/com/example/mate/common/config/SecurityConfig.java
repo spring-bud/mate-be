@@ -63,11 +63,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/index.html").permitAll()
+                        .requestMatchers("/kakao/login").permitAll()
                         .requestMatchers("/api/v1/auth/reissue").permitAll()
                         .requestMatchers("/oauth2/authorization/kakao").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/kakao/login")
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(new DefaultOAuth2UserService())
                         )
@@ -95,6 +97,7 @@ public class SecurityConfig {
                 new OrRequestMatcher(
                         new AntPathRequestMatcher("/"),
                         new AntPathRequestMatcher("/index.html"),
+                        new AntPathRequestMatcher("/kakao/login"),
                         new AntPathRequestMatcher("/api/v1/auth/reissue"),
                         new AntPathRequestMatcher("/oauth2/authorization/kakao")
                 )
