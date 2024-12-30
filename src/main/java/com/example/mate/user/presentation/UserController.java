@@ -22,7 +22,6 @@ public class UserController {
             @PathVariable Long userId
     ) {
         return ResponseEntity.ok(new ApiResponse<>(
-                "LOAD_USER_INFO_SUCCESS",
                 userService.getUserInfoWithId(userId)
         ));
     }
