@@ -24,7 +24,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     database-platform: org.hibernate.dialect.MySQL8Dialect
     properties:
       hibernate:
@@ -33,7 +33,6 @@ spring:
         format_sql: true
         highlight_sql: true
     open-in-view: false
-
 
   data:
     redis:
@@ -47,7 +46,7 @@ spring:
     import: optional:file:.env[.properties]
 
   cookie:
-    maxage: 604800
+    maxage: 987654321
     path: /
     samesite: Lax
     domain: localhost
@@ -82,5 +81,5 @@ logging:
 security:
   jwt:
     secret-key: ${JWT_SECRET}
-    access-expired: 604800
-    refresh-expired: 604800
+    access-expired: 987654321
+    refresh-expired: 987654321
