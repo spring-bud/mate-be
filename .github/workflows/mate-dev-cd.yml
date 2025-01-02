@@ -1,0 +1,77 @@
+name: MATE DEV CD
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - chore/dev-deploy
+
+jobs:
+  docker-build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 리포지토리 체크아웃
+        uses: actions/checkout@v3
+
+      - name: 환경변수 설정
+        run: echo "${{ secrets.APPLICATION_DEV_YML}}" > ./src/main/resources/application-dev.yml
+
+      - name: JDK 17 버전 설치
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Gradle 캐싱
+        uses: actions/cache@v4
+        id: cache-gradle
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Gradle 을 통해 빌드
+        run: |
+          chmod +x ./gradlew
+          ./gradlew bootJar
+
+      - name: Docker 빌드 도구 설정
+        uses: docker/setup-buildx-action@v2.9.1
+
+      - name: Docker Hub 로그인
+        uses: docker/login-action@v2.2.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Docker 이미지 빌드 및 푸시
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile-dev
+          push: true
+          platforms: linux/amd64
+          tags: mate-api:dev
+
+  docker-pull-and-run:
+    runs-on: [ dev-api-runner ]
+    needs: [ docker-build-and-push ]
+    if: ${{ needs.docker-build-and-push.result == 'success' }}
+
+    steps:
+      - name: 도커 허브 리포지토리에서 최신 이미지 가져오기
+        run: |
+          sudo docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }}
+          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/mate-api:dev
+
+      - name: 새 컨테이너 실행
+        run: |
+          sudo docker stop mate-api || true
+          sudo docker rm mate-api || true
+          sudo docker run -d --name mate-api -p 8080:8080 --network mate ${{ secrets.DOCKER_USERNAME }}/mate-api:dev
+
+      - name: 도커 이미지 정리
+        run: |
+          sudo docker image prune --all --force
