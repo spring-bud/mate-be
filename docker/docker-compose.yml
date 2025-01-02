@@ -19,7 +19,7 @@ services:
 
   redis:
     image: redis:7.2.4-alpine
-    container_name: redis7
+    container_name: mate-redis7
     command: redis-server --port 6379
     restart: always
     hostname: root
@@ -35,5 +35,5 @@ volumes:
   redis-data:
 
 networks:
-  mate-backend-network:
+  mate:
     external: true
