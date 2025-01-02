@@ -83,3 +83,13 @@ security:
     secret-key: ${JWT_SECRET}
     access-expired: 987654321
     refresh-expired: 987654321
+
+cloud:
+  aws:
+    s3:
+      cache-time-seconds: 2592000  # 30일
+      bucket-name: ${S3_BUCKET_NAME}
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_KEY}
+      image-url: ${S3_IMAGE_URL}
+      region: ${S3_REGION}
