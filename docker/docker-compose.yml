@@ -35,5 +35,5 @@ volumes:
   redis-data:
 
 networks:
-  mate-backend-network:
+  mate:
     external: true
