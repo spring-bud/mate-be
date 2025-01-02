@@ -7,6 +7,7 @@ public enum UserExceptionType implements BaseExceptionType {
     DISABLED_USER("삭제된 사용자입니다.", HttpStatus.NOT_FOUND),
     NOT_EXIST_USER("존재하지 않는 사용자입니다.", HttpStatus.NOT_FOUND),
     DUPLICATE_NICKNAME("이미 사용 중인 닉네임입니다.", HttpStatus.CONFLICT),
+    DUPLICATE_STACK("이미 추가된 기술스택입니다.", HttpStatus.BAD_REQUEST),
     NOT_MATCH_REASON_TYPE("일치하는 사유 타입이 없습니다.", HttpStatus.BAD_REQUEST),
     ;
 
