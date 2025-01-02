@@ -53,7 +53,7 @@ jobs:
           file: ./Dockerfile-dev
           push: true
           platforms: linux/amd64
-          tags: mate-api:dev
+          tags: ${{ secrets.DOCKER_USERNAME }}/mate-api:dev
 
   docker-pull-and-run:
     runs-on: [ dev-api-runner ]
