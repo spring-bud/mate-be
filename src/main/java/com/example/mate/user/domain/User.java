@@ -37,8 +37,8 @@ public class User extends BaseTimeEntity {
     @Column(columnDefinition = "TEXT", name = "reason_detail")
     private String reasonDetail;
 
-    @Column(name = "job_type")
-    private String jobType;
+    @Enumerated(EnumType.STRING)
+    private UserJobType jobType;
 
     @Column(name = "job_year")
     private Integer jobYear;
@@ -88,6 +88,60 @@ public class User extends BaseTimeEntity {
         }
     }
 
+    public void updateUserInfoAll(
+            String nickname,
+            String profileUrl,
+            UserJobType jobType,
+            Integer jobYear,
+            String intro,
+            String email,
+            String contact,
+            String githubUrl,
+            String blogUrl
+    ) {
+
+        if (nickname != null) {
+            this.nickname = nickname;
+        }
+
+        if (profileUrl != null) {
+            this.profileUrl = profileUrl;
+        }
+
+        if (status.isFirstLogin()) {
+            status = UserStatus.ACTIVE;
+        }
+
+        if (jobType != null) {
+            this.jobType = jobType;
+        }
+
+        if (jobYear != null) {
+            this.jobYear = jobYear;
+        }
+
+        if (intro != null) {
+            this.intro = intro;
+        }
+
+        if (email != null) {
+            this.email = email;
+        }
+
+        if (contact != null) {
+            this.contact = contact;
+        }
+
+        if (githubUrl != null) {
+            this.githubUrl = githubUrl;
+        }
+
+        if (blogUrl != null) {
+            this.blogUrl = blogUrl;
+        }
+    }
+
+
     public boolean isDeletedUser() {
         return status == UserStatus.DELETED;
     }
@@ -103,5 +157,14 @@ public class User extends BaseTimeEntity {
                 .toString();
         this.reasonDetail = detail;
         this.status = UserStatus.DELETED;
+    }
+
+    public void addStack(Stack stack) {
+        UserStack userStack = new UserStack(this, stack);
+        userStacks.add(userStack);
+    }
+
+    public void removeTag(Stack stack) {
+        userStacks.removeIf(userStack -> userStack.getStack().equals(stack));
     }
 }
