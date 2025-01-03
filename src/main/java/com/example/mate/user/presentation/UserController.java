@@ -2,13 +2,12 @@ package com.example.mate.user.presentation;
 
 import com.example.mate.common.response.ApiResponse;
 import com.example.mate.user.application.UserService;
+import com.example.mate.user.application.dto.UserInfoRequestDto;
 import com.example.mate.user.application.dto.UserInfoResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -24,5 +23,13 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse<>(
                 userService.getUserInfoWithId(userId)
         ));
+    }
+
+    @PatchMapping("/{userId}")
+    public ResponseEntity<UserInfoResponseDto> updateOUserInfo(
+            @AuthenticationPrincipal Long userId,
+            @RequestBody UserInfoRequestDto request
+    ) {
+        return ResponseEntity.ok(userService.updateUser(request, userId));
     }
 }

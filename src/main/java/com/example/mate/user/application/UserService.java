@@ -1,8 +1,8 @@
 package com.example.mate.user.application;
 
-import static com.example.mate.user.exception.UserExceptionType.NOT_EXIST_USER;
-
+import com.example.mate.user.application.dto.UserInfoRequestDto;
 import com.example.mate.user.application.dto.UserInfoResponseDto;
+import com.example.mate.user.domain.Stack;
 import com.example.mate.user.domain.User;
 import com.example.mate.user.domain.repository.UserRepository;
 import com.example.mate.user.exception.UserException;
@@ -10,11 +10,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
+import static com.example.mate.user.exception.UserExceptionType.NOT_EXIST_USER;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
+    private final StackService stackService;
 
     public UserInfoResponseDto getUserInfoWithId(Long userId) {
         User findUser = userRepository.findByIdAndStatusIsNotDeleted(userId)
@@ -46,5 +51,28 @@ public class UserService {
     public User getUserById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(NOT_EXIST_USER));
+    }
+
+    @Transactional
+    public UserInfoResponseDto updateUser(UserInfoRequestDto request, Long userId) {
+        User findUser = userRepository.findByIdAndStatusIsNotDeleted(userId)
+                .orElseThrow(() -> new UserException(NOT_EXIST_USER));
+        findUser.updateUserInfoAll(
+                request.nickname(),
+                request.profileUrl(),
+                request.jobType(),
+                request.jobYear(),
+                request.intro(),
+                request.email(),
+                request.contact(),
+                request.githubUrl(),
+                request.blogUrl()
+        );
+
+        List<Stack> stacks = stackService.findOrCreateStacks(request.stacks());
+        stacks.forEach(findUser::addStack);
+
+        User updateUser = userRepository.save(findUser);
+        return UserInfoResponseDto.of(updateUser);
     }
 }
