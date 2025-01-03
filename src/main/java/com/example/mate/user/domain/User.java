@@ -88,9 +88,20 @@ public class User extends BaseTimeEntity {
         }
     }
 
-    public void updateUserInfoAll(
+    public void updateUserInfoBasic(
             String nickname,
-            String profileUrl,
+            String profileUrl
+    ) {
+        if (nickname != null) {
+            this.nickname = nickname;
+        }
+
+        if (profileUrl != null) {
+            this.profileUrl = profileUrl;
+        }
+    }
+
+    public void updateUserInfoAll(
             UserJobType jobType,
             Integer jobYear,
             String intro,
@@ -99,15 +110,6 @@ public class User extends BaseTimeEntity {
             String githubUrl,
             String blogUrl
     ) {
-
-        if (nickname != null) {
-            this.nickname = nickname;
-        }
-
-        if (profileUrl != null) {
-            this.profileUrl = profileUrl;
-        }
-
         if (status.isFirstLogin()) {
             status = UserStatus.ACTIVE;
         }
@@ -164,7 +166,7 @@ public class User extends BaseTimeEntity {
         userStacks.add(userStack);
     }
 
-    public void removeTag(Stack stack) {
+    public void removeStack(Stack stack) {
         userStacks.removeIf(userStack -> userStack.getStack().equals(stack));
     }
 }
