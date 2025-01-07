@@ -57,9 +57,13 @@ public class UserService {
     public UserInfoResponseDto updateUser(UserInfoRequestDto request, Long userId) {
         User findUser = userRepository.findByIdAndStatusIsNotDeleted(userId)
                 .orElseThrow(() -> new UserException(NOT_EXIST_USER));
-        findUser.updateUserInfoAll(
+
+        findUser.updateUserInfoBasic(
                 request.nickname(),
-                request.profileUrl(),
+                request.profileUrl()
+        );
+
+        findUser.updateUserInfoAll(
                 request.jobType(),
                 request.jobYear(),
                 request.intro(),

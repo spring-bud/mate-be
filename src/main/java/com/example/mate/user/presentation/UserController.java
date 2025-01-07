@@ -25,7 +25,7 @@ public class UserController {
         ));
     }
 
-    @PatchMapping("/{userId}")
+    @PatchMapping
     public ResponseEntity<UserInfoResponseDto> updateOUserInfo(
             @AuthenticationPrincipal Long userId,
             @RequestBody UserInfoRequestDto request
