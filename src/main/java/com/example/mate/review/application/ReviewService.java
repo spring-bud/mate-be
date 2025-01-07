@@ -60,8 +60,7 @@ public class ReviewService {
 
     @Transactional
     public ReviewResponseDto updateReviewByIdAndUserId(Long reviewId, Long userId, ReviewResponseDto request) {
-        Review findReview = reviewRepository.findByIdAndUserId(reviewId, userId)
-                .orElseThrow(() -> new ReviewException(NOT_EXIST_Review));
+        Review findReview = findByIdAndUserId(reviewId, userId);
 
         findReview.updateReviewInfo(
                 request.star(),
@@ -75,9 +74,13 @@ public class ReviewService {
 
     @Transactional
     public void deleteReviewByIdAndUserId(Long reviewId, Long userId) {
-        Review findReview = reviewRepository.findByIdAndUserId(reviewId, userId)
-                .orElseThrow(() -> new ReviewException(NOT_EXIST_Review));
+        Review findReview = findByIdAndUserId(reviewId, userId);
 
         reviewRepository.delete(findReview);
+    }
+
+    private Review findByIdAndUserId(Long reviewId, Long userId) {
+        return reviewRepository.findByIdAndUserId(reviewId, userId)
+                .orElseThrow(() -> new ReviewException(NOT_EXIST_Review));
     }
 }
