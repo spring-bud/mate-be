@@ -43,17 +43,15 @@ public class ProposalService {
         return ProposalResponseDto.of(findProposals);
     }
 
-    public ProposalResponseDto getProposalByIdAndUserId(Long userId, Long ProposalId) {
-        Proposal findProposal = proposalRepository.findByIdAndUserId(ProposalId, userId)
-                .orElseThrow(() -> new ProposalException(NOT_EXIST_Proposal));
+    public ProposalResponseDto getProposalByIdAndUserId(Long userId, Long proposalId) {
+        Proposal findProposal = findByIdAndUserId(proposalId, userId);
 
         return ProposalResponseDto.of(findProposal);
     }
 
     @Transactional
-    public ProposalResponseDto updateProposalByIdAndUserId(Long userId, Long ProposalId, ProposalResponseDto request) {
-        Proposal findProposal = proposalRepository.findByIdAndUserId(ProposalId, userId)
-                .orElseThrow(() -> new ProposalException(NOT_EXIST_Proposal));
+    public ProposalResponseDto updateProposalByIdAndUserId(Long userId, Long proposalId, ProposalResponseDto request) {
+        Proposal findProposal = findByIdAndUserId(proposalId, userId);
 
         findProposal.updateProposalInfo(
                 request.title(),
@@ -66,10 +64,14 @@ public class ProposalService {
     }
 
     @Transactional
-    public void deleteProposalByIdAndUserId(Long userId, Long ProposalId) {
-        Proposal findProposal = proposalRepository.findByIdAndUserId(ProposalId, userId)
-                .orElseThrow(() -> new ProposalException(NOT_EXIST_Proposal));
+    public void deleteProposalByIdAndUserId(Long userId, Long proposalId) {
+        Proposal findProposal = findByIdAndUserId(proposalId, userId);
 
         proposalRepository.delete(findProposal);
+    }
+
+    private Proposal findByIdAndUserId(Long proposalId, Long userId) {
+        return proposalRepository.findByIdAndUserId(proposalId, userId)
+                .orElseThrow(() -> new ProposalException(NOT_EXIST_Proposal));
     }
 }
