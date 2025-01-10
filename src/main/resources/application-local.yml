@@ -16,6 +16,10 @@ spring:
     multipart:
       max-file-size: 10MB
 
+  cors:
+    allowed-methods: ${ALLOWED_METHODS}
+    allowed-origins: ${ALLOWED_ORIGINS}
+
   datasource:
     url: jdbc:mysql://localhost:3306/mate-local-db
     username: mate-local-user
