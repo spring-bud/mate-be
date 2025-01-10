@@ -1,7 +1,5 @@
 package com.example.mate.product.application;
 
-import static com.example.mate.product.exception.ProductExceptionType.PRODUCT_NOT_FOUND_EXCEPTION;
-
 import com.example.mate.product.application.dto.ProductCreateRequestDto;
 import com.example.mate.product.application.dto.ProductDetailResponseDto;
 import com.example.mate.product.application.dto.ProductIdResponseDto;
@@ -11,12 +9,15 @@ import com.example.mate.product.domain.repository.ProductRepository;
 import com.example.mate.product.exception.ProductException;
 import com.example.mate.user.application.UserService;
 import com.example.mate.user.domain.User;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static com.example.mate.product.exception.ProductExceptionType.PRODUCT_NOT_FOUND_EXCEPTION;
 
 @Service
 @RequiredArgsConstructor
@@ -56,8 +57,8 @@ public class ProductService {
         return ProductDetailResponseDto.of(findProduct, 1L, 1L, false);
     }
 
-
-    private Product findProductById(Long productId) {
+    // External Service
+    public Product findProductById(Long productId) {
         return productRepository.findByIdWithUserAndTags(productId)
                 .orElseThrow(() -> new ProductException(PRODUCT_NOT_FOUND_EXCEPTION));
     }
