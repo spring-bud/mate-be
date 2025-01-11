@@ -79,8 +79,18 @@ public class ReviewService {
         reviewRepository.delete(findReview);
     }
 
+    public Long countReview(Long productId) {
+        Long count = getCountReview(productId);
+
+        return count;
+    }
+
     private Review findByIdAndUserId(Long reviewId, Long userId) {
         return reviewRepository.findByIdAndUserId(reviewId, userId)
                 .orElseThrow(() -> new ReviewException(NOT_EXIST_Review));
+    }
+
+    private Long getCountReview(Long productId) {
+        return reviewRepository.countReviewByProductId(productId);
     }
 }
