@@ -1,8 +1,11 @@
 package com.example.mate.auth.presentation;
 
+import static org.springframework.http.HttpHeaders.SET_COOKIE;
+
 import com.example.mate.auth.application.AuthService;
 import com.example.mate.auth.application.dto.TokenResponseDto;
 import com.example.mate.common.presentation.cookie.CookieHandler;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
@@ -12,8 +15,6 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import static org.springframework.http.HttpHeaders.SET_COOKIE;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -29,12 +30,14 @@ public class AuthController {
     @PostMapping("/reissue")
     public ResponseEntity<TokenResponseDto> reissue(
             @CookieValue(COOKIE_REFRESH_TOKEN) String refreshToken,
-            HttpServletResponse response
+            HttpServletResponse response,
+            HttpServletRequest request
     ) {
         TokenResponseDto tokenPairResponse = authService.reissueTokenPair(refreshToken);
 
         ResponseCookie cookie = cookieHandler.createCookie(
-                COOKIE_REFRESH_TOKEN, tokenPairResponse.refreshToken()
+                COOKIE_REFRESH_TOKEN, tokenPairResponse.refreshToken(),
+                request
         );
 
         response.addHeader(SET_COOKIE, cookie.toString());
@@ -46,12 +49,13 @@ public class AuthController {
     public ResponseEntity<Void> logout(
             @AuthenticationPrincipal Long userId,
             @CookieValue(COOKIE_REFRESH_TOKEN) String refreshToken,
-            HttpServletResponse response
+            HttpServletResponse response,
+            HttpServletRequest request
     ) {
         authService.logout(userId, refreshToken);
 
-        ResponseCookie cookie = cookieHandler.deleteCookie(COOKIE_REFRESH_TOKEN);
-        
+        ResponseCookie cookie = cookieHandler.deleteCookie(COOKIE_REFRESH_TOKEN, request);
+
         response.addHeader(SET_COOKIE, cookie.toString());
         return ResponseEntity.ok(null);
     }

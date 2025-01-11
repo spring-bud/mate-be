@@ -1,21 +1,20 @@
 package com.example.mate.auth.infrastructure.security.oauth;
 
+import static org.springframework.http.HttpHeaders.SET_COOKIE;
+
 import com.example.mate.auth.application.AuthService;
 import com.example.mate.auth.application.dto.TokenResponseDto;
 import com.example.mate.common.presentation.cookie.CookieHandler;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-
-import static org.springframework.http.HttpHeaders.SET_COOKIE;
 
 @Component
 public class OAuthSuccessHandler implements AuthenticationSuccessHandler {
@@ -46,7 +45,8 @@ public class OAuthSuccessHandler implements AuthenticationSuccessHandler {
         TokenResponseDto tokenResponseDto = authService.loginOrRegister(oAuth2User.getName());
         ResponseCookie cookie = cookieHandler.createCookie(
                 REFRESH_TOKEN,
-                tokenResponseDto.refreshToken()
+                tokenResponseDto.refreshToken(),
+                request
         );
         response.addHeader(SET_COOKIE, cookie.toString());
         response.sendRedirect(successRedirectUrl);
