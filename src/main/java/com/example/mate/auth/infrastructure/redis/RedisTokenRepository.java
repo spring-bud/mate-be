@@ -20,7 +20,7 @@ import static com.example.mate.common.exception.redis.RedisExceptionType.SERIALI
 @RequiredArgsConstructor
 public class RedisTokenRepository implements TokenRepository {
 
-    private static final Long TTL = 10_080L;  // FIXME: 임시 TTL 10,080 분 (7일)
+    private static final Long TTL = 43_200L;  // FIXME: 임시 TTL 43,200 분 (30일)
     private static final String TOKEN_PREFIX = "token:";
 
     private final ObjectMapper objectMapper;
