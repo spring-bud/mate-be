@@ -34,9 +34,7 @@ public class LikeService {
     }
 
     public Long countLike(Long productId) {
-        Long count = getCountLike(productId);
-
-        return count;
+        return getCountLike(productId);
     }
 
     public boolean getLikeStatus(Long productId, Long userId) {
