@@ -4,7 +4,9 @@ import com.example.mate.product.domain.Product;
 import com.example.mate.product.domain.ProductCategory;
 import com.example.mate.product.domain.ProductStatus;
 import com.example.mate.product.domain.ProductTag;
+import com.example.mate.review.application.dto.ReviewResponseDto;
 import com.example.mate.user.domain.User;
+
 import java.util.List;
 
 public record ProductDetailResponseDto(
@@ -15,14 +17,16 @@ public record ProductDetailResponseDto(
         List<ProductTagInfo> productTags,
         OwnerInfo owner,
         CountInfo count,
-        Boolean isLiked
+        Boolean isLiked,
+        List<ReviewResponseDto> reviewList
 ) {
 
     public static ProductDetailResponseDto of(
             Product product,
             Long likeCount,
             Long reviewCount,
-            Boolean isLiked
+            Boolean isLiked,
+            List<ReviewResponseDto> reviewList
     ) {
         return new ProductDetailResponseDto(
                 product.getTitle(),
@@ -34,7 +38,8 @@ public record ProductDetailResponseDto(
                         .toList(),
                 OwnerInfo.of(product.getUser()),
                 CountInfo.of(likeCount, reviewCount),
-                isLiked
+                isLiked,
+                reviewList
         );
     }
 
