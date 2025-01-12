@@ -1,7 +1,10 @@
 package com.example.mate.product.presentation;
 
 import com.example.mate.common.response.ApiResponse;
+import com.example.mate.product.application.LikeService;
+import com.example.mate.product.application.ProductSearchService;
 import com.example.mate.product.application.ProductService;
+import com.example.mate.product.application.dto.ProductAllResponseDto;
 import com.example.mate.product.application.dto.ProductCreateRequestDto;
 import com.example.mate.product.application.dto.ProductDetailResponseDto;
 import com.example.mate.product.application.dto.ProductIdResponseDto;
@@ -10,13 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import com.example.mate.auth.presentation.support.OptionalUser;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -25,6 +24,8 @@ import com.example.mate.auth.presentation.support.OptionalUser;
 public class ProductController {
 
     private final ProductService productService;
+    private final LikeService likeService;
+    private final ProductSearchService productSearchService;
 
     @PostMapping
     public ResponseEntity<ApiResponse<ProductIdResponseDto>> createProduct(
@@ -35,13 +36,30 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(productIdResponse));
     }
 
-    @GetMapping("/{productId}")
+    @GetMapping("/{userId}")
+    public ResponseEntity<ApiResponse<List<ProductAllResponseDto>>> getProducts(
+            @PathVariable Long userId
+    ) {
+        return ResponseEntity.ok(new ApiResponse<>(productSearchService.getProduct(userId)));
+    }
+
+    @GetMapping("/{productId}/{userId}")
     public ResponseEntity<ApiResponse<ProductDetailResponseDto>> getProductById(
-            @OptionalUser Long userId,
+            @PathVariable Long userId,
             @PathVariable Long productId
     ) {
+
+        return ResponseEntity.ok(new ApiResponse<>(productSearchService.getProductById(productId, userId)));
+    }
+
+    @PostMapping("/like/{productId}")
+    public ResponseEntity<ApiResponse<Boolean>> createOrDeleteLike(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable Long productId
+    ) {
+        likeService.createOrDeleteLike(userId, productId);
         return ResponseEntity.ok(new ApiResponse<>(
-                productService.getProductById(productId))
+                likeService.getLikeStatus(productId, userId))
         );
     }
 }
