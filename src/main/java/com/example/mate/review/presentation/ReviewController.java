@@ -31,7 +31,7 @@ public class ReviewController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ReviewResponseDto>>> getUserReview(
+    public ResponseEntity<ApiResponse<List<ReviewUserResponseDto>>> getUserReview(
             @AuthenticationPrincipal Long userId
     ) {
         return ResponseEntity.ok(new ApiResponse<>(
