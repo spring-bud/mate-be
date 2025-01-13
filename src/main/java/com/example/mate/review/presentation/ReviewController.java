@@ -4,6 +4,7 @@ import com.example.mate.common.response.ApiResponse;
 import com.example.mate.proposal.application.dto.ProposalResponseDto;
 import com.example.mate.review.application.ReviewService;
 import com.example.mate.review.application.dto.ReviewResponseDto;
+import com.example.mate.review.application.dto.ReviewUserResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +40,7 @@ public class ReviewController {
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<ApiResponse<List<ReviewResponseDto>>> getProductReview(
+    public ResponseEntity<ApiResponse<List<ReviewUserResponseDto>>> getProductReview(
             @AuthenticationPrincipal Long userId,
             @PathVariable Long productId
     ) {
