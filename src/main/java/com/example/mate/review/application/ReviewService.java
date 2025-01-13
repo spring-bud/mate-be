@@ -3,6 +3,7 @@ package com.example.mate.review.application;
 import com.example.mate.product.application.ProductService;
 import com.example.mate.product.domain.Product;
 import com.example.mate.review.application.dto.ReviewResponseDto;
+import com.example.mate.review.application.dto.ReviewUserResponseDto;
 import com.example.mate.review.domain.Review;
 import com.example.mate.review.domain.repository.ReviewRepository;
 import com.example.mate.review.exception.ReviewException;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.example.mate.review.exception.ReviewExceptionType.NOT_EXIST_Review;
 
@@ -42,12 +44,23 @@ public class ReviewService {
         return ReviewResponseDto.of(saveReview);
     }
 
-    public List<ReviewResponseDto> getReviewByProductId(Long ProductId) {
+    public List<ReviewUserResponseDto> getReviewByProductId(Long ProductId) {
         //TODO: 나중에 필요하면
         //Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Order.desc("createdAt")));
         List<Review> findProductReviews = reviewRepository.findByProductId(ProductId);
 
-        return ReviewResponseDto.of(findProductReviews);
+        List<ReviewUserResponseDto> reviewAll = findProductReviews.stream()
+                .map(review -> {
+                    User findUser = userService.getUserById(review.getUser().getId());
+
+                    return ReviewUserResponseDto.of(
+                            review,
+                            findUser
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return reviewAll;
     }
 
     public List<ReviewResponseDto> getReviewByUserId(Long userId) {
