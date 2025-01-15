@@ -2,12 +2,15 @@ package com.example.mate.user.presentation;
 
 import com.example.mate.common.response.ApiResponse;
 import com.example.mate.user.application.UserService;
+import com.example.mate.user.application.dto.PopularityUserInfoResponseDto;
 import com.example.mate.user.application.dto.UserInfoRequestDto;
 import com.example.mate.user.application.dto.UserInfoResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -31,5 +34,13 @@ public class UserController {
             @RequestBody UserInfoRequestDto request
     ) {
         return ResponseEntity.ok(userService.updateUser(request, userId));
+    }
+
+    @GetMapping("/popularity")
+    public ResponseEntity<ApiResponse<List<PopularityUserInfoResponseDto>>> getPopularityUserInfo(
+    ) {
+        return ResponseEntity.ok(new ApiResponse<>(
+                userService.getPopularityUsersInfo())
+        );
     }
 }
