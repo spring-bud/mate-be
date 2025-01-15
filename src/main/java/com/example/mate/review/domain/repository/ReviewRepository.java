@@ -1,6 +1,7 @@
 package com.example.mate.review.domain.repository;
 
 import com.example.mate.review.domain.Review;
+import com.example.mate.user.application.dto.PopularityUserReviewResponseDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -11,15 +12,19 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("""
             SELECT r FROM Review r
              LEFT JOIN FETCH r.product p
+             LEFT JOIN FETCH r.user u
              WHERE p.user.id = :userId
-             ORDER BY r.createdAt DESC
+             AND u.status != 'DELETED'
+             ORDER BY r.createdAt DESC  
             """)
     List<Review> findByUserId(Long userId);
 
     @Query("""
             SELECT r FROM Review r
              LEFT JOIN FETCH r.product p
+             LEFT JOIN FETCH r.user u
              WHERE p.id = :productId
+             AND u.status != 'DELETED'
              ORDER BY r.createdAt DESC
             """)
     List<Review> findByProductId(Long productId);
@@ -31,4 +36,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
              WHERE r.product.id = :productId
             """)
     Long countReviewByProductId(Long productId);
+
+    @Query("""
+            SELECT new com.example.mate.user.application.dto.PopularityUserReviewResponseDto(COUNT(r), AVG(r.star)) FROM Review r
+             LEFT JOIN r.product p
+             WHERE p.user.id = :userId
+            """)
+    PopularityUserReviewResponseDto findByuserId(Long userId);
 }
