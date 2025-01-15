@@ -16,6 +16,10 @@ spring:
     multipart:
       max-file-size: 10MB
 
+  cors:
+    allowed-methods: ${ALLOWED_METHODS}
+    allowed-origins: ${ALLOWED_ORIGINS}
+
   datasource:
     url: jdbc:mysql://localhost:3306/mate-local-db
     username: mate-local-user
@@ -41,12 +45,11 @@ spring:
       repositories:
         enabled: false
 
-
   config:
     import: optional:file:.env[.properties]
 
   cookie:
-    maxage: 987654321
+    maxage: 2592000
     path: /
     samesite: Lax
     domain: localhost
@@ -81,5 +84,15 @@ logging:
 security:
   jwt:
     secret-key: ${JWT_SECRET}
-    access-expired: 987654321
-    refresh-expired: 987654321
+    access-expired: 604800000 # 7일
+    refresh-expired: 2592000000 # 30일
+
+cloud:
+  aws:
+    s3:
+      cache-time-seconds: 2592000 # 30일
+      bucket-name: ${S3_BUCKET_NAME}
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_KEY}
+      image-url: ${S3_IMAGE_URL}
+      region: ${S3_REGION}

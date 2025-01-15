@@ -25,4 +25,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByProductId(Long productId);
 
     Optional<Review> findByIdAndUserId(Long reviewId, Long userId);
+
+    @Query("""
+            SELECT COUNT(r) FROM Review r
+             WHERE r.product.id = :productId
+            """)
+    Long countReviewByProductId(Long productId);
 }
