@@ -9,6 +9,7 @@ import com.example.mate.user.domain.User;
 import java.util.List;
 
 public record ProductDetailResponseDto(
+        Long id,
         String title,
         String content,
         ProductCategory category,
@@ -26,6 +27,7 @@ public record ProductDetailResponseDto(
             Boolean isLiked
     ) {
         return new ProductDetailResponseDto(
+                product.getId(),
                 product.getTitle(),
                 product.getContent(),
                 product.getCategory(),
