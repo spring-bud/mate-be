@@ -2,6 +2,8 @@ package com.example.mate.review.domain;
 
 import com.example.mate.common.domain.BaseTimeEntity;
 import com.example.mate.product.domain.Product;
+import com.example.mate.review.exception.ReviewException;
+import com.example.mate.review.exception.ReviewExceptionType;
 import com.example.mate.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -34,12 +36,16 @@ public class Review extends BaseTimeEntity {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
+    @Enumerated(EnumType.STRING)
+    private ReviewStatus status;
+
     @Builder
-    public Review(User user, Product product, double star, String content) {
+    public Review(User user, Product product, double star, String content, ReviewStatus status) {
         this.user = user;
         this.product = product;
         this.star = star;
         this.content = content;
+        this.status = status;
     }
 
     public void updateReviewInfo(Double star, String content) {
@@ -48,6 +54,12 @@ public class Review extends BaseTimeEntity {
         }
         if (content != null) {
             this.content = content;
+        }
+    }
+
+    public void isOwnerOrThrow(Long userId) {
+        if (!user.getId().equals(userId)) {
+            throw new ReviewException(ReviewExceptionType.NO_PERMISSIONS_ON_REVIEW);
         }
     }
 }
