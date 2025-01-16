@@ -7,6 +7,7 @@ import com.example.mate.user.domain.UserStack;
 import java.util.List;
 
 public record PopularityUserInfoResponseDto(
+        Long id,
         String nickname,
         String profileUrl,
         UserJobType jobType,
@@ -17,6 +18,7 @@ public record PopularityUserInfoResponseDto(
 ) {
     public static PopularityUserInfoResponseDto of(User user, PopularityUserReviewResponseDto userReviewInfo) {
         return new PopularityUserInfoResponseDto(
+                user.getId(),
                 user.getNickname(),
                 user.getProfileUrl(),
                 user.getJobType(),

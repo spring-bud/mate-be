@@ -7,12 +7,14 @@ import java.util.stream.Collectors;
 
 
 public record ProposalResponseDto(
+        Long id,
         String title,
         String description
 ) {
 
     public static ProposalResponseDto of(Proposal proposal) {
         return new ProposalResponseDto(
+                proposal.getId(),
                 proposal.getTitle(),
                 proposal.getDescription()
         );
