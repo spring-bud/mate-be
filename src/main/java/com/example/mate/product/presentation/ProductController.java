@@ -57,9 +57,8 @@ public class ProductController {
             @AuthenticationPrincipal Long userId,
             @PathVariable Long productId
     ) {
-        likeService.createOrDeleteLike(userId, productId);
         return ResponseEntity.ok(new ApiResponse<>(
-                likeService.getLikeStatus(productId, userId))
+                likeService.createOrDeleteLike(userId, productId))
         );
     }
 }
