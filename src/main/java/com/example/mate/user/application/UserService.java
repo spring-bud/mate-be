@@ -99,7 +99,7 @@ public class UserService {
                     User findUser = userRepository.findByIdAndStatusIsNotDeleted(popularityUser.userId())
                             .orElseThrow(() -> new UserException(NOT_EXIST_USER));
 
-                    PopularityUserReviewResponseDto userReviewInfo = reviewRepository.findByuserId(popularityUser.userId());
+                    PopularityUserReviewResponseDto userReviewInfo = reviewRepository.findByUserIdReviewStats(popularityUser.userId());
 
                     return PopularityUserInfoResponseDto.of(
                             findUser,
