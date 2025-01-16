@@ -16,7 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.example.mate.review.exception.ReviewExceptionType.NOT_EXIST_Review;
+import static com.example.mate.review.domain.ReviewStatus.ACTIVE;
+import static com.example.mate.review.exception.ReviewExceptionType.NOT_EXIST_REVIEW;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +38,7 @@ public class ReviewService {
                 .product(findProduct)
                 .star(request.star())
                 .content(request.content())
+                .status(ACTIVE)
                 .build();
 
         Review saveReview = reviewRepository.save(newReview);
@@ -84,7 +86,9 @@ public class ReviewService {
 
     @Transactional
     public ReviewResponseDto updateReviewByIdAndUserId(Long reviewId, Long userId, ReviewResponseDto request) {
-        Review findReview = findByIdAndUserId(reviewId, userId);
+        Review findReview = findById(reviewId);
+
+        findReview.isOwnerOrThrow(userId);
 
         findReview.updateReviewInfo(
                 request.star(),
@@ -98,18 +102,27 @@ public class ReviewService {
 
     @Transactional
     public void deleteReviewByIdAndUserId(Long reviewId, Long userId) {
-        Review findReview = findByIdAndUserId(reviewId, userId);
+        Review findReview = findById(reviewId);
 
-        reviewRepository.delete(findReview);
+        findReview.isOwnerOrThrow(userId);
+
+        findReview.softDelete();
+
+        reviewRepository.save(findReview);
+    }
+
+    @Transactional
+    public void deleteReviewByProductId(Long productId) {
+        reviewRepository.updateStatusdByProductId(productId);
     }
 
     public Long countReview(Long productId) {
         return getCountReview(productId);
     }
 
-    private Review findByIdAndUserId(Long reviewId, Long userId) {
-        return reviewRepository.findByIdAndUserId(reviewId, userId)
-                .orElseThrow(() -> new ReviewException(NOT_EXIST_Review));
+    private Review findById(Long reviewId) {
+        return reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ReviewException(NOT_EXIST_REVIEW));
     }
 
     private Long getCountReview(Long productId) {
