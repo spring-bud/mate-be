@@ -23,4 +23,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "LEFT JOIN FETCH p.productTags pt " +
             "LEFT JOIN FETCH pt.tag ")
     List<Product> findWithUserAndTags();
+
+    @Query("SELECT p FROM Product p " +
+            "LEFT JOIN FETCH p.user " +
+            "LEFT JOIN FETCH p.productTags pt " +
+            "LEFT JOIN FETCH pt.tag " +
+            "WHERE p.user.id = :userId")
+    List<Product> findByUserId(@Param("userId") Long userId);
 }
