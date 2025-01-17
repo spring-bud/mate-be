@@ -7,7 +7,6 @@ import com.example.mate.product.application.dto.ProductLikeReviewDto;
 import com.example.mate.product.domain.Product;
 import com.example.mate.product.domain.repository.ProductRepository;
 import com.example.mate.review.application.ReviewService;
-import com.example.mate.review.application.dto.ReviewUserResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,14 +32,12 @@ public class ProductSearchService {
 
         Product findProduct = productService.findProductById(productId);
         ProductLikeReviewDto likeReviewInfo = likeReviewInfo(productId, userId);
-        List<ReviewUserResponseDto> reviewList = reviewService.getReviewByProductId(productId);
 
         return ProductDetailResponseDto.of(
                 findProduct,
                 likeReviewInfo.likeCount(),
                 likeReviewInfo.reviewCount(),
-                likeReviewInfo.likeStatus(),
-                reviewList
+                likeReviewInfo.likeStatus()
         );
     }
 

@@ -63,12 +63,23 @@ public class ReviewService {
         return reviewAll;
     }
 
-    public List<ReviewResponseDto> getReviewByUserId(Long userId) {
+    public List<ReviewUserResponseDto> getReviewByUserId(Long userId) {
         //TODO: 나중에 필요하면
         //Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Order.desc("createdAt"))) ;
         List<Review> findUserReviews = reviewRepository.findByUserId(userId);
 
-        return ReviewResponseDto.of(findUserReviews);
+        List<ReviewUserResponseDto> reviewAll = findUserReviews.stream()
+                .map(review -> {
+                    User findUser = userService.getUserById(review.getUser().getId());
+
+                    return ReviewUserResponseDto.of(
+                            review,
+                            findUser
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return reviewAll;
     }
 
     @Transactional
