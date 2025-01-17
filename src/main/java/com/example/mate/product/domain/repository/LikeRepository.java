@@ -13,11 +13,20 @@ import java.util.Optional;
 @Repository
 public interface LikeRepository extends JpaRepository<Like, Long> {
 
+    @Query("""
+            SELECT l FROM Like l
+            LEFT JOIN l.user u
+            WHERE l.user.id = :userId
+            AND u.status != 'DELETED'
+            AND l.product.id = :productId
+            """)
     Optional<Like> findByUserIdAndProductId(Long userId, Long productId);
 
     @Query("""
             SELECT COUNT(l) FROM Like l
-             WHERE l.product.id = :productId
+            LEFT JOIN l.user u
+            WHERE l.product.id = :productId
+            and u.status != 'DELETED'
             """)
     Long countLikeByProductId(Long productId);
 
