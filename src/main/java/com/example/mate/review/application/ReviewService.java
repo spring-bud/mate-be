@@ -80,9 +80,7 @@ public class ReviewService {
     }
 
     public Long countReview(Long productId) {
-        Long count = getCountReview(productId);
-
-        return count;
+        return getCountReview(productId);
     }
 
     private Review findByIdAndUserId(Long reviewId, Long userId) {
