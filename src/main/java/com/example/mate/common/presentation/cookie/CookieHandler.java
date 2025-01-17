@@ -33,14 +33,9 @@ public class CookieHandler {
                 .path(properties.getPath())
                 .sameSite(properties.getSameSite())
                 .secure(properties.isSecure())
+                .domain(properties.getDomain())
                 .httpOnly(properties.isHttpOnly());
-        return setDomainIfNotLocal(cookieBuilder);
-    }
-
-    private ResponseCookie setDomainIfNotLocal(ResponseCookieBuilder cookieBuilder) {
-        if (!properties.getDomain().equalsIgnoreCase(LOCAL_HOST)) {
-            cookieBuilder.domain(properties.getDomain());
-        }
         return cookieBuilder.build();
     }
+
 }
