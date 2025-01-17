@@ -43,6 +43,13 @@ public class ProductController {
         return ResponseEntity.ok(new ApiResponse<>(productSearchService.getProduct(userId)));
     }
 
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<ApiResponse<List<ProductAllResponseDto>>> getProductsByUserID(
+            @PathVariable Long userId
+    ) {
+        return ResponseEntity.ok(new ApiResponse<>(productSearchService.getProductByUserId(userId)));
+    }
+
     @GetMapping("/{productId}/{userId}")
     public ResponseEntity<ApiResponse<ProductDetailResponseDto>> getProductById(
             @PathVariable Long userId,
