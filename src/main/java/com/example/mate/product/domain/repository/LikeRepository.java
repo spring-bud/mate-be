@@ -22,7 +22,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     Long countLikeByProductId(Long productId);
 
     @Query("""
-            SELECT new com.example.mate.user.application.dto.PopularityUserResponseDto(p.user.id as userId, COUNT(*) as count) FROM Like l
+            SELECT p.user.id as userId, COUNT(*) as count FROM Like l
             LEFT JOIN l.product p
             LEFT JOIN l.user u
             WHERE u.status != 'DELETED'
