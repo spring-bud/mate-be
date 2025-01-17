@@ -1,7 +1,6 @@
 package com.example.mate.product.application;
 
 import com.example.mate.product.application.dto.ProductCreateRequestDto;
-import com.example.mate.product.application.dto.ProductDetailResponseDto;
 import com.example.mate.product.application.dto.ProductIdResponseDto;
 import com.example.mate.product.domain.Product;
 import com.example.mate.product.domain.Tag;
@@ -47,14 +46,6 @@ public class ProductService {
         Product savedProduct = productRepository.save(newProduct);
 
         return new ProductIdResponseDto(savedProduct.getId());
-    }
-
-    @Transactional
-    public ProductDetailResponseDto getProductById(Long productId) {
-        Product findProduct = findProductById(productId);
-        // TODO : count 변경
-        // TODO : 좋아요 상태 적용
-        return ProductDetailResponseDto.of(findProduct, 1L, 1L, false);
     }
 
     // External Service
