@@ -53,7 +53,7 @@ spring:
     path: /
     samesite: Lax
     domain: localhost
-    secure: false
+    secure: true
     http-only: true
 
   security:
