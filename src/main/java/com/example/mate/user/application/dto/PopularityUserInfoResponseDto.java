@@ -22,8 +22,8 @@ public record PopularityUserInfoResponseDto(
                 user.getNickname(),
                 user.getProfileUrl(),
                 user.getJobType(),
-                userReviewInfo.count(),
-                userReviewInfo.star(),
+                userReviewInfo.getCount(),
+                userReviewInfo.getStar(),
                 user.getUserStacks().stream()
                         .map(UserStackInfo::from)
                         .toList()

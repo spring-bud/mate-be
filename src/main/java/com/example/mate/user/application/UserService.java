@@ -96,10 +96,10 @@ public class UserService {
 
         List<PopularityUserInfoResponseDto> popularityUsersInfo = getPopularityUsers().stream()
                 .map(popularityUser -> {
-                    User findUser = userRepository.findByIdAndStatusIsNotDeleted(popularityUser.userId())
+                    User findUser = userRepository.findByIdAndStatusIsNotDeleted(popularityUser.getUserId())
                             .orElseThrow(() -> new UserException(NOT_EXIST_USER));
 
-                    PopularityUserReviewResponseDto userReviewInfo = reviewRepository.findByUserIdReviewStats(popularityUser.userId());
+                    PopularityUserReviewResponseDto userReviewInfo = reviewRepository.findByUserIdReviewStats(popularityUser.getUserId());
 
                     return PopularityUserInfoResponseDto.of(
                             findUser,

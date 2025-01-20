@@ -39,7 +39,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Long countReviewByProductId(Long productId);
 
     @Query("""
-            SELECT new com.example.mate.user.application.dto.PopularityUserReviewResponseDto(COUNT(r), AVG(r.star)) FROM Review r
+            SELECT COUNT(r) as count, AVG(r.star) as star FROM Review r
              LEFT JOIN r.product p
              WHERE p.user.id = :userId
              AND r.status != 'DELETED'
