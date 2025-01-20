@@ -15,6 +15,8 @@ import java.util.Date;
 public class JwtProvider implements TokenProvider {
 
     private static final String USER_ID = "user_id";
+    private static final String USER_URL = "user_url";
+    private static final String USER_NICKNAME = "user_nickname";
     private static final String TOKEN_ID = "token_id";
     private static final String ACCESS_TOKEN = "access_token";
     private static final String REFRESH_TOKEN = "refresh_token";
@@ -28,8 +30,10 @@ public class JwtProvider implements TokenProvider {
     }
 
     @Override
-    public String generatedAccessToken(Long userId) {
+    public String generatedAccessToken(Long userId, String userProfileUrl, String userNickname) {
         Claims claims = generatedClaims(USER_ID, userId);
+        claims.put(USER_URL, userProfileUrl);
+        claims.put(USER_NICKNAME, userNickname);
         return generatedToken(claims, ACCESS_TOKEN, jwtProperties.getAccessExpired());
     }
 
@@ -47,7 +51,7 @@ public class JwtProvider implements TokenProvider {
 
     private String generatedToken(Claims claims, String subject, Long exp) {
         long now = System.currentTimeMillis();
-        
+
         return Jwts.builder()
                 .setClaims(claims)                   //사용자 정의 데이터
                 .setSubject(subject)                 //jwt 소유자 사용자의 식별자로 사용된다

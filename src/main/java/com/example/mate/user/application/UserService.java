@@ -35,10 +35,10 @@ public class UserService {
     }
 
     @Transactional
-    public User getOrRegisterByOAuthId(String oAuthId) {
+    public User getOrRegisterByOAuthId(String oAuthId, String kakaoImageUrl) {
         return userRepository.findByKakaoId(oAuthId)
                 .map(this::activateIfDeleted)
-                .orElseGet(() -> registerNewUserAndPublish(oAuthId));
+                .orElseGet(() -> registerNewUserAndPublish(oAuthId, kakaoImageUrl));
     }
 
     private User activateIfDeleted(User user) {
@@ -48,8 +48,8 @@ public class UserService {
         return user;
     }
 
-    private User registerNewUserAndPublish(String oAuthId) {
-        User newUser = User.builder().kakaoId(oAuthId).build();
+    private User registerNewUserAndPublish(String oAuthId, String profileUrl) {
+        User newUser = User.builder().kakaoId(oAuthId).profileUrl(profileUrl).build();
         User saveUser = userRepository.save(newUser);
         return saveUser;
     }
@@ -86,6 +86,11 @@ public class UserService {
         User updateUser = userRepository.save(findUser);
         return UserInfoResponseDto.of(updateUser);
     }
+
+//    @Transactional
+//    public User deleteUser(Long userId) {
+//        User findUser = getUserById(userId);
+//    }
 
     private List<PopularityUserResponseDto> getPopularityUsers() {
         Pageable pageRequest = PageRequest.of(0, 5, Sort.by(Sort.Order.desc("count")));
