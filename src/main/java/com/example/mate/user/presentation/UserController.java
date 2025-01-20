@@ -1,10 +1,9 @@
 package com.example.mate.user.presentation;
 
 import com.example.mate.common.response.ApiResponse;
+import com.example.mate.proposal.application.dto.ProposalResponseDto;
 import com.example.mate.user.application.UserService;
-import com.example.mate.user.application.dto.PopularityUserInfoResponseDto;
-import com.example.mate.user.application.dto.UserInfoRequestDto;
-import com.example.mate.user.application.dto.UserInfoResponseDto;
+import com.example.mate.user.application.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -42,5 +41,20 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse<>(
                 userService.getPopularityUsersInfo())
         );
+    }
+
+    @DeleteMapping
+    public ResponseEntity<ApiResponse<ProposalResponseDto>> deleteUser(
+            @AuthenticationPrincipal Long userId,
+            @RequestBody UserWithdrawRequestDto request
+    ) {
+        userService.deleteUser(userId, request);
+        return ResponseEntity.ok(null);
+    }
+
+    @GetMapping("/reasontype")
+    public ResponseEntity<ApiResponse<List<ReasonTypeDto>>> getReasonTypeList(
+    ) {
+        return ResponseEntity.ok(new ApiResponse<>(userService.getReasonTypeList()));
     }
 }
