@@ -20,8 +20,8 @@ public class AuthService {
     private final TokenExtractor tokenExtractor;
     private final TokenRepository tokenRepository;
 
-    public TokenResponseDto loginOrRegister(String oAuthId) {
-        User findUser = userService.getOrRegisterByOAuthId(oAuthId);
+    public TokenResponseDto loginOrRegister(String oAuthId, String kakaoImageUrl) {
+        User findUser = userService.getOrRegisterByOAuthId(oAuthId, kakaoImageUrl);
 
         Token newToken = Token.builder()
                 .userId(findUser.getId())
@@ -29,7 +29,11 @@ public class AuthService {
 
         tokenRepository.save(newToken);
 
-        String accessToken = tokenProvider.generatedAccessToken(newToken.getUserId());
+        String accessToken = tokenProvider.generatedAccessToken(
+                newToken.getUserId(),
+                findUser.getProfileUrl(),
+                findUser.getNickname()
+        );
         String refreshToken = tokenProvider.generatedRefreshToken(newToken.getTokenId());
         return TokenResponseDto.of(accessToken, refreshToken);
     }
@@ -48,7 +52,13 @@ public class AuthService {
 
         tokenRepository.save(newToken);
 
-        String accessToken = tokenProvider.generatedAccessToken(newToken.getUserId());
+        User findUser = userService.getUserById(newToken.getUserId());
+
+        String accessToken = tokenProvider.generatedAccessToken(
+                newToken.getUserId(),
+                findUser.getProfileUrl(),
+                findUser.getNickname()
+        );
         String refreshToken = tokenProvider.generatedRefreshToken(newToken.getTokenId());
         return TokenResponseDto.of(accessToken, refreshToken);
     }
