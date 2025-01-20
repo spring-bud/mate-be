@@ -42,6 +42,31 @@ public class ProductSearchService {
     }
 
     @Transactional
+    public List<ProductAllResponseDto> getProductByUserId(
+            Long userId
+    ) {
+        //TODO: 나중에 필요하면
+        //Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Order.desc("createdAt")));
+
+        List<Product> findProducts = productRepository.findByUserId(userId);
+
+        List<ProductAllResponseDto> productAll = findProducts.stream()
+                .map(product -> {
+                    ProductLikeReviewDto likeReviewInfo = likeReviewInfo(product.getId(), userId);
+
+                    return ProductAllResponseDto.of(
+                            product,
+                            likeReviewInfo.likeCount(),
+                            likeReviewInfo.reviewCount(),
+                            likeReviewInfo.likeStatus()
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return productAll;
+    }
+
+    @Transactional
     public List<ProductAllResponseDto> getProduct(
             Long userId
     ) {
