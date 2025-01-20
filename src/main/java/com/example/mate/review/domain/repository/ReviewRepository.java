@@ -3,6 +3,7 @@ package com.example.mate.review.domain.repository;
 import com.example.mate.review.domain.Review;
 import com.example.mate.user.application.dto.PopularityUserReviewResponseDto;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -46,10 +47,19 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             """)
     PopularityUserReviewResponseDto findByUserIdReviewStats(Long userId);
 
+    @Modifying
     @Query("""
             UPDATE Review r
              SET r.status = 'DELETED'
              WHERE r.product.id = :productId
             """)
     void updateStatusdByProductId(Long productId);
+
+    @Modifying
+    @Query("""
+            UPDATE Review r
+             SET r.status = 'DELETED'
+             WHERE r.user.id = :userId
+            """)
+    void updateStatusdByUsertId(Long userId);
 }
