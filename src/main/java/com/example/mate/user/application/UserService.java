@@ -1,8 +1,10 @@
 package com.example.mate.user.application;
 
 import com.example.mate.product.domain.repository.LikeRepository;
+import com.example.mate.product.domain.repository.ProductRepository;
 import com.example.mate.review.domain.repository.ReviewRepository;
 import com.example.mate.user.application.dto.*;
+import com.example.mate.user.domain.ReasonType;
 import com.example.mate.user.domain.Stack;
 import com.example.mate.user.domain.User;
 import com.example.mate.user.domain.repository.UserRepository;
@@ -14,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +28,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
+    private final ProductRepository productRepository;
     private final ReviewRepository reviewRepository;
     private final StackService stackService;
 
@@ -87,10 +91,14 @@ public class UserService {
         return UserInfoResponseDto.of(updateUser);
     }
 
-//    @Transactional
-//    public User deleteUser(Long userId) {
-//        User findUser = getUserById(userId);
-//    }
+    @Transactional
+    public void deleteUser(Long userId, UserWithdrawRequestDto request) {
+        User findUser = getUserById(userId);
+        findUser.withdrawWithAddReason(request.reasonTypeList(), request.detail());
+        userRepository.save(findUser);
+        productRepository.updateStatusdByUsertId(userId);
+        reviewRepository.updateStatusdByUsertId(userId);
+    }
 
     private List<PopularityUserResponseDto> getPopularityUsers() {
         Pageable pageRequest = PageRequest.of(0, 5, Sort.by(Sort.Order.desc("count")));
@@ -113,5 +121,11 @@ public class UserService {
                 })
                 .collect(Collectors.toList());
         return popularityUsersInfo;
+    }
+
+    public List<ReasonTypeDto> getReasonTypeList() {
+        return Arrays.stream(ReasonType.values())
+                .map(reasonType -> new ReasonTypeDto(reasonType.name(), reasonType.description()))
+                .collect(Collectors.toList());
     }
 }
