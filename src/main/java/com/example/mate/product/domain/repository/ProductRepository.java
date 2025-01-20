@@ -12,22 +12,25 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p " +
-            "LEFT JOIN FETCH p.user " +
+            "LEFT JOIN FETCH p.user u " +
             "LEFT JOIN FETCH p.productTags pt " +
             "LEFT JOIN FETCH pt.tag " +
-            "WHERE p.id = :productId")
+            "WHERE p.id = :productId " +
+            "AND u.status != 'DELETED'")
     Optional<Product> findByIdWithUserAndTags(@Param("productId") Long productId);
 
     @Query("SELECT p FROM Product p " +
-            "LEFT JOIN FETCH p.user " +
+            "LEFT JOIN FETCH p.user u " +
             "LEFT JOIN FETCH p.productTags pt " +
-            "LEFT JOIN FETCH pt.tag ")
+            "LEFT JOIN FETCH pt.tag " +
+            "WHERE u.status != 'DELETED'")
     List<Product> findWithUserAndTags();
 
     @Query("SELECT p FROM Product p " +
-            "LEFT JOIN FETCH p.user " +
+            "LEFT JOIN FETCH p.user u " +
             "LEFT JOIN FETCH p.productTags pt " +
             "LEFT JOIN FETCH pt.tag " +
-            "WHERE p.user.id = :userId")
+            "WHERE p.user.id = :userId " +
+            "AND u.status != 'DELETED'")
     List<Product> findByUserId(@Param("userId") Long userId);
 }
