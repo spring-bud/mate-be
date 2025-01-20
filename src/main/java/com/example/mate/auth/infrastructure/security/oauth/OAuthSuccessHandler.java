@@ -14,6 +14,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Map;
 
 import static org.springframework.http.HttpHeaders.SET_COOKIE;
 
@@ -43,7 +44,12 @@ public class OAuthSuccessHandler implements AuthenticationSuccessHandler {
             Authentication authentication
     ) throws IOException, ServletException {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-        TokenResponseDto tokenResponseDto = authService.loginOrRegister(oAuth2User.getName());
+
+        Map<String, Object> attributes = oAuth2User.getAttributes();
+        Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
+        String profileImageUrl = (String) properties.get("profile_image");
+
+        TokenResponseDto tokenResponseDto = authService.loginOrRegister(oAuth2User.getName(), profileImageUrl);
         ResponseCookie cookie = cookieHandler.createCookie(
                 REFRESH_TOKEN,
                 tokenResponseDto.refreshToken()
