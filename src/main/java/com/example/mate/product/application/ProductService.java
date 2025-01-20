@@ -6,6 +6,7 @@ import com.example.mate.product.domain.Product;
 import com.example.mate.product.domain.Tag;
 import com.example.mate.product.domain.repository.ProductRepository;
 import com.example.mate.product.exception.ProductException;
+import com.example.mate.review.domain.repository.ReviewRepository;
 import com.example.mate.user.application.UserService;
 import com.example.mate.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class ProductService {
     private final UserService userService;
     private final TagService tagService;
     private final ProductRepository productRepository;
+    private final ReviewRepository reviewRepository;
 
     @Transactional
     public ProductIdResponseDto createProduct(Long userId, ProductCreateRequestDto request) {
@@ -52,5 +54,12 @@ public class ProductService {
     public Product findProductById(Long productId) {
         return productRepository.findByIdWithUserAndTags(productId)
                 .orElseThrow(() -> new ProductException(PRODUCT_NOT_FOUND_EXCEPTION));
+    }
+
+    @Transactional
+    public void deleteProduct(Long userId, Long productId) {
+        Product findProduct = findProductById(productId);
+        findProduct.softDelete(userId);
+        reviewRepository.updateStatusdByProductId(productId);
     }
 }

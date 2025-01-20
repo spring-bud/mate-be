@@ -8,6 +8,7 @@ import com.example.mate.product.application.dto.ProductAllResponseDto;
 import com.example.mate.product.application.dto.ProductCreateRequestDto;
 import com.example.mate.product.application.dto.ProductDetailResponseDto;
 import com.example.mate.product.application.dto.ProductIdResponseDto;
+import com.example.mate.proposal.application.dto.ProposalResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -67,5 +68,14 @@ public class ProductController {
         return ResponseEntity.ok(new ApiResponse<>(
                 likeService.createOrDeleteLike(userId, productId))
         );
+    }
+
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<ApiResponse<ProposalResponseDto>> deleteProduct(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable Long productId
+    ) {
+        productService.deleteProduct(userId, productId);
+        return ResponseEntity.ok(null);
     }
 }
