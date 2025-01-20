@@ -62,8 +62,9 @@ public class User extends BaseTimeEntity {
     private List<UserStack> userStacks = new ArrayList<>();
 
     @Builder
-    public User(String kakaoId) {
+    public User(String kakaoId, String profileUrl) {
         this.kakaoId = kakaoId;
+        this.profileUrl = profileUrl;
         this.nickname = DefaultNicknamePolicy.generatedRandomString();
         this.status = UserStatus.ACTIVE_FIRST_LOGIN;
     }
