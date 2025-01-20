@@ -12,6 +12,7 @@ public record ProductAllResponseDto(
         Long id,
         String title,
         String content,
+        String thumbnailUrl,
         ProductCategory category,
         ProductStatus status,
         List<ProductAllResponseDto.ProductTagInfo> productTags,
@@ -30,6 +31,7 @@ public record ProductAllResponseDto(
                 product.getId(),
                 product.getTitle(),
                 product.getContent(),
+                product.getThumbnailUrl(),
                 product.getCategory(),
                 product.getStatus(),
                 product.getProductTags().stream()
