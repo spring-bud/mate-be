@@ -29,70 +29,110 @@ public class LikeService {
     private final RedisTemplate<String, Long> redisTemplate;
 
     @Transactional
-    public boolean createOrDeleteLike(Long userId, Long productIdL) {
-        String productId = String.valueOf(productIdL);
+    public boolean toggleLike(Long userId, Long longProductId) {
+        String productId = String.valueOf(longProductId);
         User findUser = userService.getUserById(userId);
-
-        Product findProduct = productService.findProductById(productIdL);
-
-        Long likeCount = 0L;
-        Long returnCount = -1L;
-        Boolean likeStatus = false;
-
-        SetOperations<String, Long> setProductId = redisTemplate.opsForSet();
+        Product findProduct = productService.findProductById(longProductId);
 
         HashOperations<String, Long, Long> hashOperations = redisTemplate.opsForHash();
-
-
-        Long userProductPlus = hashOperations.get(productId, userId);
-        Long userProductMinus = hashOperations.get(productId, -userId);
+        SetOperations<String, Long> setProductId = redisTemplate.opsForSet();
 
         boolean existsRedisProductId = Boolean.TRUE.equals(redisTemplate.hasKey(productId));
 
-        if (!existsRedisProductId) {
-            setProductId.add("productId", productIdL);
-            Like existingLike = getExistingLike(userId, productIdL);
-            likeCount = countLike(productIdL);
-            if (existingLike == null) {
-                hashOperations.put(productId, userId, likeCount);
-                likeCount++;
-            } else {
-                hashOperations.put(productId, -userId, likeCount);
-                likeCount--;
-                likeStatus = true;
-            }
+        Long existsRedisLikeCount = existsRedisLikeCount(existsRedisProductId, productId, hashOperations);
+
+        boolean likeStatus = handleLikeStatus(userId, productId, hashOperations, setProductId, existsRedisLikeCount);
+        Long likeCount = redisLikeCount(productId, hashOperations);
+
+        messagingTemplate.convertAndSend("/sub/like-count/" + productId, likeCount);
+
+        return likeStatus;
+    }
+
+    private boolean handleLikeStatus(
+            Long userId,
+            String productId,
+            HashOperations<String, Long, Long> hashOperations,
+            SetOperations<String, Long> setProductId,
+            Long likeCount
+    ) {
+        Long userProductpLUS = hashOperations.get(productId, userId);
+        Long userProductMinus = hashOperations.get(productId, -userId);
+
+        if (userProductpLUS == null && userProductMinus == null) {
+            return handleNewRedis(userId, productId, hashOperations, setProductId, likeCount);
         } else {
-            Set<Long> hashUserId = hashOperations.keys(productId);
+            return handleExistingRedis(userId, productId, userProductMinus, hashOperations, setProductId);
+        }
+    }
+
+    private boolean handleNewRedis(
+            Long userId,
+            String productId,
+            HashOperations<String, Long, Long> hashOperations,
+            SetOperations<String, Long> setProductId,
+            Long likeCount
+    ) {
+        setProductId.add("productId", Long.parseLong(productId));
+        Like existingLike = getExistingLike(userId, Long.parseLong(productId));
+
+        if (existingLike == null) {
+            hashOperations.put(productId, userId, likeCount);
+        } else {
+            hashOperations.put(productId, -userId, likeCount);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean handleExistingRedis(
+            Long userId,
+            String productId,
+            Long userProductMinus,
+            HashOperations<String, Long, Long> hashOperations,
+            SetOperations<String, Long> setProductId
+    ) {
+        if (userProductMinus == null) {
+            hashOperations.delete(productId, userId);
+            setProductId.remove("productId", Long.parseLong(productId));
+        } else {
+            hashOperations.delete(productId, -userId);
+            setProductId.remove("productId", Long.parseLong(productId));
+            return true;
+        }
+        return false;
+    }
+
+    private Long redisLikeCount(
+            String productId,
+            HashOperations<String, Long, Long> hashOperations
+    ) {
+        Map<Long, Long> entries = hashOperations.entries(productId);
+        Set<Long> hashUserId = hashOperations.keys(productId);
+
+        Long keyUserId = hashUserId.iterator().next();
+
+        long returnCount = entries.get(keyUserId);
+
+        for (Long key : hashUserId) {
+            returnCount += (key > 0) ? 1 : -1;
+        }
+        return returnCount;
+    }
+
+    private Long existsRedisLikeCount(boolean existsRedisProductId, String productId, HashOperations<String, Long, Long> hashOperations) {
+        Long likeCount = 0L;
+        if (!existsRedisProductId) {
+            likeCount = countLike(Long.parseLong(productId));
+        } else {
             Map<Long, Long> entries = hashOperations.entries(productId);
+            Set<Long> hashUserId = hashOperations.keys(productId);
 
             Long keyUserId = hashUserId.iterator().next();
 
             likeCount = entries.get(keyUserId);
-
-            returnCount = likeCount;
-
-            if (userProductMinus == null) {
-                hashOperations.delete(productId, userId);
-                setProductId.remove("productId", productIdL);
-            } else {
-                hashOperations.delete(productId, -userId);
-                setProductId.remove("productId", productIdL);
-                likeStatus = true;
-            }
-
-            Set<Long> hashUserIdCount = hashOperations.keys(productId);
-            for (Long key : hashUserIdCount) {
-                if (key > 0) {
-                    returnCount++;
-                } else {
-                    returnCount--;
-                }
-            }
         }
-
-        messagingTemplate.convertAndSend("/sub/like-count/" + productId, existsRedisProductId ? returnCount : likeCount);
-
-        return likeStatus;
+        return likeCount;
     }
 
     public Long countLike(Long productId) {
