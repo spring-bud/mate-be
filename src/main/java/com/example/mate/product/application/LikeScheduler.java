@@ -18,7 +18,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class LikeScheduler {
 
-    private final RedisTemplate<String, Long> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
     private final LikeService likeService;
     private final LikeRepository likeRepository;
     private final UserService userService;
@@ -27,22 +27,22 @@ public class LikeScheduler {
     @SchedulerLock(name = "syncLikeCountToDB", lockAtMostFor = "PT30S", lockAtLeastFor = "PT5S")
     @Scheduled(fixedRate = 5000)
     public void syncLikeCountToDB() {
-        Set<Long> setProductId = redisTemplate.opsForSet().members("productId");
+        Set<Object> setProductId = redisTemplate.opsForSet().members("productId");
 
         if (!setProductId.isEmpty()) {
-            for (Long productId : setProductId) {
+            for (Object productId : setProductId) {
                 HashOperations<String, Long, Long> hashOperations = redisTemplate.opsForHash();
                 Set<Long> hashUserIds = hashOperations.keys(String.valueOf(productId));
 
                 for (Long userId : hashUserIds) {
                     User findUser = userService.getUserById(Math.abs(userId));
-                    Product findProduct = productService.findProductById(productId);
+                    Product findProduct = productService.findProductById((Long) productId);
 
                     if (userId > 0) {
                         Like newLike = new Like(findUser, findProduct);
                         likeRepository.save(newLike);
                     } else {
-                        Like newLike = likeService.getExistingLike(Math.abs(userId), productId);
+                        Like newLike = likeService.getExistingLike(Math.abs(userId), (Long) productId);
                         likeRepository.delete(newLike);
                     }
                 }
