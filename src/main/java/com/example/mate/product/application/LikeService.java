@@ -26,7 +26,7 @@ public class LikeService {
     private final SimpMessageSendingOperations messagingTemplate;
 
 
-    private final RedisTemplate<String, Long> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Transactional
     public boolean toggleLike(Long userId, Long longProductId) {
@@ -35,7 +35,7 @@ public class LikeService {
         Product findProduct = productService.findProductById(longProductId);
 
         HashOperations<String, Long, Long> hashOperations = redisTemplate.opsForHash();
-        SetOperations<String, Long> setProductId = redisTemplate.opsForSet();
+        SetOperations<String, Object> setProductId = redisTemplate.opsForSet();
 
         boolean existsRedisProductId = Boolean.TRUE.equals(redisTemplate.hasKey(productId));
 
@@ -53,7 +53,7 @@ public class LikeService {
             Long userId,
             String productId,
             HashOperations<String, Long, Long> hashOperations,
-            SetOperations<String, Long> setProductId,
+            SetOperations<String, Object> setProductId,
             Long likeCount
     ) {
         Long userProductpLUS = hashOperations.get(productId, userId);
@@ -70,7 +70,7 @@ public class LikeService {
             Long userId,
             String productId,
             HashOperations<String, Long, Long> hashOperations,
-            SetOperations<String, Long> setProductId,
+            SetOperations<String, Object> setProductId,
             Long likeCount
     ) {
         setProductId.add("productId", Long.parseLong(productId));
@@ -90,7 +90,7 @@ public class LikeService {
             String productId,
             Long userProductMinus,
             HashOperations<String, Long, Long> hashOperations,
-            SetOperations<String, Long> setProductId
+            SetOperations<String, Object> setProductId
     ) {
         if (userProductMinus == null) {
             hashOperations.delete(productId, userId);
@@ -113,9 +113,10 @@ public class LikeService {
         Long keyUserId = hashUserId.iterator().next();
 
         long returnCount = entries.get(keyUserId);
-
-        for (Long key : hashUserId) {
-            returnCount += (key > 0) ? 1 : -1;
+        if (!hashUserId.isEmpty()) {
+            for (Long key : hashUserId) {
+                returnCount += (key > 0) ? 1 : -1;
+            }
         }
         return returnCount;
     }
