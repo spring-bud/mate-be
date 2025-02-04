@@ -3,8 +3,10 @@ package com.example.mate.chat.application;
 import com.example.mate.chat.application.dto.ChatMessageDto;
 import com.example.mate.chat.application.dto.ChatMessageInfoDto;
 import com.example.mate.chat.domain.ChatMessage;
+import com.example.mate.chat.domain.ChatRead;
 import com.example.mate.chat.domain.ChatUser;
 import com.example.mate.chat.domain.repository.ChatMessageRepository;
+import com.example.mate.chat.domain.repository.ChatReadRepository;
 import com.example.mate.chat.domain.repository.ChatUserRepository;
 import com.example.mate.chat.exception.ChatException;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +21,14 @@ public class ChatMessageService {
 
     private final ChatUserRepository chatUserRepository;
     private final ChatMessageRepository chatMessageRepository;
+    private final ChatReadRepository chatReadRepository;
     private final ChatMessageEventPublisher messageEventPublisher;
+    private final ChatMessageCountPublisher chatMessageCountPublisher;
 
     public void sendChatMessage(Long userId, ChatMessageDto message) {
         ChatMessageInfoDto messageInfoDto = createAndSaveMessage(userId, message);
+        Long messageCount = chatReadRepository.countByRoomTokenAndSenderId(message.roomToken(), userId);
+        chatMessageCountPublisher.execute(messageInfoDto.senderId(), messageInfoDto.roomToken(), messageCount);
         messageEventPublisher.execute(messageInfoDto);
     }
 
@@ -46,6 +52,12 @@ public class ChatMessageService {
                 .message(message.message())
                 .build();
         ChatMessage savedChatMessage = chatMessageRepository.save(chatMessage);
+        ChatRead chatRead = ChatRead.builder()
+                .roomToken(message.roomToken())
+                .messageId(savedChatMessage.getId())
+                .senderId(userId)
+                .build();
+        chatReadRepository.save(chatRead);
         return ChatMessageInfoDto.of(savedChatMessage, findUser);
     }
 
