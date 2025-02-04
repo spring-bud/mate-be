@@ -1,13 +1,14 @@
 package com.example.mate.chat.application;
 
-import com.example.mate.chat.application.dto.ChatMessageDto;
 import com.example.mate.chat.application.dto.ChatMessageInfoDto;
 import com.example.mate.chat.application.dto.ChatMessageResponseDto;
+import com.example.mate.chat.application.dto.ChatRoomListDto;
 import com.example.mate.chat.application.dto.ChatRoomTokenDto;
 import com.example.mate.chat.domain.ChatMessage;
 import com.example.mate.chat.domain.ChatRoom;
 import com.example.mate.chat.domain.ChatUser;
 import com.example.mate.chat.domain.repository.ChatMessageRepository;
+import com.example.mate.chat.domain.repository.ChatReadRepository;
 import com.example.mate.chat.domain.repository.ChatRoomRepository;
 import com.example.mate.chat.domain.repository.ChatUserRepository;
 import com.example.mate.chat.exception.ChatException;
@@ -28,7 +29,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.example.mate.chat.exception.ChatExceptionType.INVALID_CHAT_ROOM_ID_EXCEPTION;
+import static com.example.mate.chat.exception.ChatExceptionType.INVALID_CHAT_USER_ID_EXCEPTION;
+import static com.example.mate.chat.exception.ChatExceptionType.INVALID_MAKE_CHAT_ROOM_USER_ID_EXCEPTION;
 
 @Service
 @RequiredArgsConstructor
@@ -42,10 +44,15 @@ public class ChatService {
     private final ChatMessageRepository chatMessageRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final ProductService productService;
-    private final ChatMessageService chatMessageService;
+    private final ChatReadRepository chatReadRepository;
+    private final ChatMessageCountPublisher chatMessageCountPublisher;
 
-    public ChatRoomTokenDto createChatRoom(Long productId, Long custromerId, ChatMessageDto messageDto) {
+    public ChatRoomTokenDto createChatRoom(Long productId, Long custromerId) {
         Product product = productService.findProductById(productId);
+
+        if (product.getUser().getId().equals(custromerId)) {
+            throw new ChatException(INVALID_MAKE_CHAT_ROOM_USER_ID_EXCEPTION);
+        }
 
         ChatRoom findChatRoom = chatRoomRepository.findChatRoomByUser1UdAndUser2Id(product.getUser().getId(), custromerId, productId);
 
@@ -59,13 +66,18 @@ public class ChatService {
         return new ChatRoomTokenDto(findChatRoom.getRoomToken());
     }
 
-    public ChatRoomTokenDto getRoomTokenByProductId(Long productId) {
-        ChatRoom findChatRoom = chatRoomRepository.findChatRoomTokenByProductId(productId)
-                .orElseThrow(() -> new ChatException(INVALID_CHAT_ROOM_ID_EXCEPTION));
-        return new ChatRoomTokenDto(findChatRoom.getRoomToken());
-    }
+    public ChatMessageResponseDto getMessagesByRoomToken(String roomToken, Long userId, ObjectId cursorId, int limit) {
+        chatReadRepository.deleteByRoomToken(roomToken);
+        ChatRoom chatRoomInfo = chatRoomRepository.findChatRoomBytokenId(roomToken);
+        Long otherUser;
+        if (userId == chatRoomInfo.getUser1Id()) {
+            otherUser = chatRoomInfo.getUser2Id();
+        } else {
+            otherUser = chatRoomInfo.getUser1Id();
+        }
+        Long messageCount = chatReadRepository.countByRoomTokenAndSenderId(roomToken, otherUser);
+        chatMessageCountPublisher.execute(otherUser, roomToken, messageCount);
 
-    public ChatMessageResponseDto getMessagesByRoomToken(String roomToken, ObjectId cursorId, int limit) {
         List<ChatMessage> pagedChatMessageList = getPagedChatMessages(roomToken, cursorId, limit);
         boolean hasNext = checkHasNextPage(pagedChatMessageList, limit);
         List<ChatMessage> chatMessageList = getChatMessagesToLimit(pagedChatMessageList, hasNext, limit);
@@ -80,6 +92,32 @@ public class ChatService {
                 .toList();
         Map<Long, ChatUser> userInfoMap = getUserInfoForMessages(chatMessageList);
         return mapMessagesToDto(chatMessageList, userInfoMap, false);
+    }
+
+    public List<ChatRoomListDto> getChatRoomList(Long userId) {
+        List<ChatRoom> chatRoomList = chatRoomRepository.findChatRoomListByUserId(userId);
+
+        List<ChatRoomListDto> chatRoomListInfo = chatRoomList.stream()
+                .map(chatRoomInfo -> {
+                    Long otherUser;
+                    if (chatRoomInfo.getUser1Id().equals(userId)) {
+                        otherUser = chatRoomInfo.getUser2Id();
+                    } else {
+                        otherUser = chatRoomInfo.getUser1Id();
+                    }
+
+                    ChatUser otherUserInfo = chatUserRepository.findByUserId(otherUser)
+                            .orElseThrow(() -> new ChatException(INVALID_CHAT_USER_ID_EXCEPTION));
+
+                    return ChatRoomListDto.of(
+                            chatRoomInfo,
+                            otherUserInfo
+                    );
+                })
+                .collect(Collectors.toList());
+
+
+        return chatRoomListInfo;
     }
 
     private List<ChatMessage> getPagedChatMessages(String roomToken, ObjectId cursorId, int limit) {
