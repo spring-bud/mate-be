@@ -7,9 +7,12 @@ import com.example.mate.user.application.dto.*;
 import com.example.mate.user.domain.ReasonType;
 import com.example.mate.user.domain.Stack;
 import com.example.mate.user.domain.User;
+import com.example.mate.user.domain.event.UserCreateEvent;
+import com.example.mate.user.domain.event.UserUpdateEvent;
 import com.example.mate.user.domain.repository.UserRepository;
 import com.example.mate.user.exception.UserException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -31,6 +34,7 @@ public class UserService {
     private final ProductRepository productRepository;
     private final ReviewRepository reviewRepository;
     private final StackService stackService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public UserInfoResponseDto getUserInfoWithId(Long userId) {
         User findUser = userRepository.findByIdAndStatusIsNotDeleted(userId)
@@ -55,6 +59,7 @@ public class UserService {
     private User registerNewUserAndPublish(String oAuthId, String profileUrl) {
         User newUser = User.builder().kakaoId(oAuthId).profileUrl(profileUrl).build();
         User saveUser = userRepository.save(newUser);
+        eventPublisher.publishEvent(UserCreateEvent.of(saveUser));
         return saveUser;
     }
 
@@ -88,6 +93,8 @@ public class UserService {
         stacks.forEach(findUser::addStack);
 
         User updateUser = userRepository.save(findUser);
+        eventPublisher.publishEvent(UserUpdateEvent.of(updateUser));
+
         return UserInfoResponseDto.of(updateUser);
     }
 
