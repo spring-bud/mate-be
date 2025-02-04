@@ -61,12 +61,12 @@ public class ProductController {
     }
 
     @PostMapping("/like/{productId}")
-    public ResponseEntity<ApiResponse<Boolean>> createOrDeleteLike(
+    public ResponseEntity<ApiResponse<Boolean>> toggleLike(
             @AuthenticationPrincipal Long userId,
             @PathVariable Long productId
     ) {
         return ResponseEntity.ok(new ApiResponse<>(
-                likeService.createOrDeleteLike(userId, productId))
+                likeService.toggleLike(userId, productId))
         );
     }
 
