@@ -4,6 +4,7 @@ import com.example.mate.chat.application.ChatMessageService;
 import com.example.mate.chat.application.ChatService;
 import com.example.mate.chat.application.dto.ChatMessageDto;
 import com.example.mate.chat.application.dto.ChatMessageResponseDto;
+import com.example.mate.chat.application.dto.ChatRoomListDto;
 import com.example.mate.chat.application.dto.ChatRoomTokenDto;
 import com.example.mate.product.application.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,8 @@ import org.bson.types.ObjectId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/chat")
@@ -24,10 +27,9 @@ public class ChatController {
     @PostMapping("/create/room/{productId}")
     public ResponseEntity<ChatRoomTokenDto> createRoom(
             @AuthenticationPrincipal Long userId,
-            @PathVariable Long productId,
-            @RequestBody ChatMessageDto messageDto
+            @PathVariable Long productId
     ) {
-        return ResponseEntity.ok(chatService.createChatRoom(productId, userId, messageDto));
+        return ResponseEntity.ok(chatService.createChatRoom(productId, userId));
     }
 
     @PostMapping("/chat")
@@ -43,10 +45,11 @@ public class ChatController {
     @GetMapping("/{roomToken}/messages")
     public ResponseEntity<ChatMessageResponseDto> getChatMessages(
             @PathVariable String roomToken,
+            @AuthenticationPrincipal Long userId,
             @RequestParam(value = "cursorId", required = false) ObjectId cursorId,
             @RequestParam(defaultValue = "20") int limit
     ) {
-        return ResponseEntity.ok(chatService.getMessagesByRoomToken(roomToken, cursorId, limit));
+        return ResponseEntity.ok(chatService.getMessagesByRoomToken(roomToken, userId, cursorId, limit));
     }
 
     @GetMapping("/{roomToken}/messages/recent")
@@ -54,5 +57,12 @@ public class ChatController {
             @PathVariable String roomToken
     ) {
         return ResponseEntity.ok(chatService.getRecentMessagesByRoomToken(roomToken));
+    }
+
+    @GetMapping("/chatRoomList")
+    public ResponseEntity<List<ChatRoomListDto>> getChatRoomList(
+            @AuthenticationPrincipal Long userId
+    ) {
+        return ResponseEntity.ok(chatService.getChatRoomList(userId));
     }
 }
