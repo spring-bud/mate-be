@@ -63,7 +63,9 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/index.html").permitAll()
+                        .requestMatchers("/websocket.html").permitAll()
                         .requestMatchers("/api/v1/auth/reissue").permitAll()
                         .requestMatchers("/oauth2/authorization/kakao").permitAll()
                         .requestMatchers("/api/v1/users/{userId}").permitAll()
@@ -98,7 +100,9 @@ public class SecurityConfig {
         return new NegatedRequestMatcher(
                 new OrRequestMatcher(
                         new AntPathRequestMatcher("/"),
+                        new AntPathRequestMatcher("/ws/**"),
                         new AntPathRequestMatcher("/index.html"),
+                        new AntPathRequestMatcher("/websocket.html"),
                         new AntPathRequestMatcher("/api/v1/auth/reissue"),
                         new AntPathRequestMatcher("/oauth2/authorization/kakao"),
                         new AntPathRequestMatcher("/api/v1/users/{userId}", "GET"),

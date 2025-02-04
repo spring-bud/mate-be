@@ -45,6 +45,12 @@ spring:
       repositories:
         enabled: false
 
+    mongodb:
+      uri: mongodb://root:root@localhost:27017/mate-local-db?authSource=admin
+      database: mate-local-db
+      auto-index-creation: true
+      authentication-database: admin
+
   config:
     import: optional:file:.env[.properties]
 

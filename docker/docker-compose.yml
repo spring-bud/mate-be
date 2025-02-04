@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   mysql:
     image: mysql:8.3.0
@@ -30,9 +28,24 @@ services:
     volumes:
       - redis-data:/data
 
+  mongodb:
+    image: mongo:7.0.1
+    container_name: mongo7
+    ports:
+      - '27017:27017'
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: mate-local-db
+    volumes:
+      - mongo-data:/data/db
+      - ./init.js:/docker-entrypoint-initdb.d/init.js
+
 volumes:
   mate-mysqldb:
   redis-data:
+  mongo-data:
 
 networks:
   mate:
