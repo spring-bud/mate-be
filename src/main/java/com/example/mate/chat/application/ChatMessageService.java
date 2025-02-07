@@ -2,17 +2,20 @@ package com.example.mate.chat.application;
 
 import com.example.mate.chat.application.dto.ChatMessageDto;
 import com.example.mate.chat.application.dto.ChatMessageInfoDto;
-import com.example.mate.chat.domain.ChatMessage;
-import com.example.mate.chat.domain.ChatRead;
-import com.example.mate.chat.domain.ChatUser;
+import com.example.mate.chat.application.dto.ChatMessageInfoDto.EnterAndLeaveMessage;
+import com.example.mate.chat.domain.*;
 import com.example.mate.chat.domain.repository.ChatMessageRepository;
 import com.example.mate.chat.domain.repository.ChatReadRepository;
+import com.example.mate.chat.domain.repository.ChatRoomRepository;
 import com.example.mate.chat.domain.repository.ChatUserRepository;
 import com.example.mate.chat.exception.ChatException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import static com.example.mate.chat.domain.MessageType.TALK;
+import java.time.LocalDateTime;
+
+import static com.example.mate.chat.domain.MessageType.*;
 import static com.example.mate.chat.exception.ChatExceptionType.INVALID_CHAT_USER_ID_EXCEPTION;
 
 @Service
@@ -22,6 +25,7 @@ public class ChatMessageService {
     private final ChatUserRepository chatUserRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatReadRepository chatReadRepository;
+    private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageEventPublisher messageEventPublisher;
     private final ChatMessageCountPublisher chatMessageCountPublisher;
 
@@ -32,15 +36,24 @@ public class ChatMessageService {
         messageEventPublisher.execute(messageInfoDto);
     }
 
-    //TODO: 보류 처리 미사용시 삭제
-//    public void sendEnterLeaveMessage(Long userId, ChatMessageDto message) {
-//        ChatUser findUser = chatUserRepository.findByUserId(userId)
-//                .orElseThrow(() -> new ChatException(INVALID_CHAT_USER_ID_EXCEPTION));
-//
-//        String formattedMessage = formatEnterLeaveMessage(message.type(), findUser.getNickname());
-//        EnterAndLeaveMessage messageInfoDto = createEnterLeaveMessage(message, formattedMessage);
-//        messageEventPublisher.execute(messageInfoDto);
-//    }
+    @Transactional
+    public void sendEnterLeaveMessage(Long userId, ChatMessageDto message) {
+        ChatUser findUser = chatUserRepository.findByUserId(userId)
+                .orElseThrow(() -> new ChatException(INVALID_CHAT_USER_ID_EXCEPTION));
+
+        ChatRoom chatRoomInfo = chatRoomRepository.findChatRoomBytokenId(message.roomToken());
+
+        if (message.type().equals(LEAVE)) {
+            if (chatRoomInfo.getUser1Id() == userId) {
+                chatRoomRepository.leaveChatRoomUser1(userId, message.roomToken());
+            } else {
+                chatRoomRepository.leaveChatRoomUser2(userId, message.roomToken());
+            }
+        }
+        String formattedMessage = formatEnterLeaveMessage(message.type(), findUser.getNickname());
+        EnterAndLeaveMessage messageInfoDto = createEnterLeaveMessage(message, formattedMessage);
+        messageEventPublisher.execute(messageInfoDto);
+    }
 
     private ChatMessageInfoDto createAndSaveMessage(Long userId, ChatMessageDto message) {
         ChatUser findUser = chatUserRepository.findByUserId(userId)
@@ -62,17 +75,17 @@ public class ChatMessageService {
     }
 
     //TODO: 보류 처리 미사용시 삭제
-//    private String formatEnterLeaveMessage(MessageType type, String nickname) {
-//        return (type.equals(ENTER) ? ENTER.getMessage() : LEAVE.getMessage())
-//                .formatted(nickname);
-//    }
-//
-//    private EnterAndLeaveMessage createEnterLeaveMessage(ChatMessageDto messageDto, String message) {
-//        return EnterAndLeaveMessage.of(
-//                messageDto.type().name(),
-//                messageDto.roomToken(),
-//                message,
-//                LocalDateTime.now()
-//        );
-//    }
+    private String formatEnterLeaveMessage(MessageType type, String nickname) {
+        return (type.equals(ENTER) ? ENTER.getMessage() : LEAVE.getMessage())
+                .formatted(nickname);
+    }
+
+    private EnterAndLeaveMessage createEnterLeaveMessage(ChatMessageDto messageDto, String message) {
+        return EnterAndLeaveMessage.of(
+                messageDto.type().name(),
+                messageDto.roomToken(),
+                message,
+                LocalDateTime.now()
+        );
+    }
 }
