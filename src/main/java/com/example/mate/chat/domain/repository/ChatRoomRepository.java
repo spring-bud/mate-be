@@ -2,6 +2,7 @@ package com.example.mate.chat.domain.repository;
 
 import com.example.mate.chat.domain.ChatRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -34,4 +35,22 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
               AND p.status != 'DELETED'
             """)
     ChatRoom findChatRoomBytokenId(String roomToken);
+
+    @Modifying
+    @Query("""
+            UPDATE ChatRoom cr
+             SET cr.user1Id = NULL
+             WHERE cr.user1Id = :userId
+              AND cr.roomToken = :roomToken
+            """)
+    void leaveChatRoomUser1(Long userId, String roomToken);
+
+    @Modifying
+    @Query("""
+            UPDATE ChatRoom cr
+             SET cr.user2Id = NULL
+             WHERE cr.user2Id = :userId
+              AND cr.roomToken = :roomToken
+            """)
+    void leaveChatRoomUser2(Long userId, String roomToken);
 }
