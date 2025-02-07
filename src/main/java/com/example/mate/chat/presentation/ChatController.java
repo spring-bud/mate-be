@@ -24,6 +24,15 @@ public class ChatController {
     private final ChatService chatService;
     private final ChatMessageService chatMessageService;
 
+    @PostMapping("/greet")
+    public ResponseEntity<Void> enterLeaveMessage(
+            @AuthenticationPrincipal Long userId,
+            @RequestBody ChatMessageDto messageDto
+    ) {
+        chatMessageService.sendEnterLeaveMessage(userId, messageDto);
+        return ResponseEntity.ok(null);
+    }
+
     @PostMapping("/create/room/{productId}")
     public ResponseEntity<ChatRoomTokenDto> createRoom(
             @AuthenticationPrincipal Long userId,
