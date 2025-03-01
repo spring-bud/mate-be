@@ -8,7 +8,6 @@ import com.example.mate.product.application.dto.ProductAllResponseDto;
 import com.example.mate.product.application.dto.ProductCreateRequestDto;
 import com.example.mate.product.application.dto.ProductDetailResponseDto;
 import com.example.mate.product.application.dto.ProductIdResponseDto;
-import com.example.mate.proposal.application.dto.ProposalResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -71,7 +70,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{productId}")
-    public ResponseEntity<ApiResponse<ProposalResponseDto>> deleteProduct(
+    public ResponseEntity<Void> deleteProduct(
             @AuthenticationPrincipal Long userId,
             @PathVariable Long productId
     ) {
