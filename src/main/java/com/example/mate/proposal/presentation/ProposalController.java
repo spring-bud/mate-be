@@ -58,7 +58,7 @@ public class ProposalController {
     }
 
     @DeleteMapping("/{proposalId}")
-    public ResponseEntity<ApiResponse<ProposalResponseDto>> deleteProposalById(
+    public ResponseEntity<Void> deleteProposalById(
             @AuthenticationPrincipal Long userId,
             @PathVariable Long proposalId
     ) {
