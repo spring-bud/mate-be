@@ -1,7 +1,6 @@
 package com.example.mate.review.presentation;
 
 import com.example.mate.common.response.ApiResponse;
-import com.example.mate.proposal.application.dto.ProposalResponseDto;
 import com.example.mate.review.application.ReviewService;
 import com.example.mate.review.application.dto.ReviewResponseDto;
 import com.example.mate.review.application.dto.ReviewUserResponseDto;
@@ -61,7 +60,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{reviewId}")
-    public ResponseEntity<ApiResponse<ProposalResponseDto>> deleteReviewById(
+    public ResponseEntity<Void> deleteReviewById(
             @AuthenticationPrincipal Long userId,
             @PathVariable Long reviewId
     ) {
