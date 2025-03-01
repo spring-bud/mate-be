@@ -1,7 +1,6 @@
 package com.example.mate.user.presentation;
 
 import com.example.mate.common.response.ApiResponse;
-import com.example.mate.proposal.application.dto.ProposalResponseDto;
 import com.example.mate.user.application.UserService;
 import com.example.mate.user.application.dto.*;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +43,7 @@ public class UserController {
     }
 
     @DeleteMapping
-    public ResponseEntity<ApiResponse<ProposalResponseDto>> deleteUser(
+    public ResponseEntity<Void> deleteUser(
             @AuthenticationPrincipal Long userId,
             @RequestBody UserWithdrawRequestDto request
     ) {
