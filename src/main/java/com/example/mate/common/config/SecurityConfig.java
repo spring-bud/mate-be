@@ -64,6 +64,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
                         .requestMatchers("/index.html").permitAll()
                         .requestMatchers("/websocket.html").permitAll()
                         .requestMatchers("/api/v1/auth/reissue").permitAll()
@@ -101,6 +104,9 @@ public class SecurityConfig {
                 new OrRequestMatcher(
                         new AntPathRequestMatcher("/"),
                         new AntPathRequestMatcher("/ws/**"),
+                        new AntPathRequestMatcher("/swagger-ui/**"),
+                        new AntPathRequestMatcher("/swagger-ui.html"),
+                        new AntPathRequestMatcher("/v3/api-docs/**"),
                         new AntPathRequestMatcher("/index.html"),
                         new AntPathRequestMatcher("/websocket.html"),
                         new AntPathRequestMatcher("/api/v1/auth/reissue"),
