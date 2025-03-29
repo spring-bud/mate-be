@@ -85,8 +85,8 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewResponseDto updateReviewByIdAndUserId(Long reviewId, Long userId, ReviewResponseDto request) {
-        Review findReview = findById(reviewId);
+    public ReviewResponseDto updateReviewByIdAndUserId(Long userId, ReviewResponseDto request) {
+        Review findReview = findById(request.id());
 
         findReview.isOwnerOrThrow(userId);
 
