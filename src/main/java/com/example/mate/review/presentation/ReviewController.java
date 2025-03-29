@@ -48,14 +48,13 @@ public class ReviewController {
         );
     }
 
-    @PatchMapping("/{reviewId}")
+    @PatchMapping
     public ResponseEntity<ApiResponse<ReviewResponseDto>> updateReviewById(
             @AuthenticationPrincipal Long userId,
-            @RequestBody ReviewResponseDto request,
-            @PathVariable Long reviewId
+            @RequestBody ReviewResponseDto request
     ) {
         return ResponseEntity.ok(new ApiResponse<>(
-                reviewService.updateReviewByIdAndUserId(reviewId, userId, request))
+                reviewService.updateReviewByIdAndUserId(userId, request))
         );
     }
 
