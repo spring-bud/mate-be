@@ -27,11 +27,13 @@ public class UserController {
     }
 
     @PatchMapping
-    public ResponseEntity<UserInfoResponseDto> updateOUserInfo(
+    public ResponseEntity<ApiResponse<UserInfoResponseDto>> updateOUserInfo(
             @AuthenticationPrincipal Long userId,
             @RequestBody UserInfoRequestDto request
     ) {
-        return ResponseEntity.ok(userService.updateUser(request, userId));
+        return ResponseEntity.ok(new ApiResponse<>(
+                userService.updateUser(request, userId)
+        ));
     }
 
     @GetMapping("/popularity")
