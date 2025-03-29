@@ -6,6 +6,7 @@ import com.example.mate.chat.application.dto.ChatMessageDto;
 import com.example.mate.chat.application.dto.ChatMessageResponseDto;
 import com.example.mate.chat.application.dto.ChatRoomListDto;
 import com.example.mate.chat.application.dto.ChatRoomTokenDto;
+import com.example.mate.common.response.ApiResponse;
 import com.example.mate.product.application.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
@@ -34,11 +35,14 @@ public class ChatController {
     }
 
     @PostMapping("/create/room/{productId}")
-    public ResponseEntity<ChatRoomTokenDto> createRoom(
+    public ResponseEntity<ApiResponse<ChatRoomTokenDto>> createRoom(
             @AuthenticationPrincipal Long userId,
             @PathVariable Long productId
     ) {
-        return ResponseEntity.ok(chatService.createChatRoom(productId, userId));
+        return ResponseEntity.ok(new ApiResponse<>(
+                        chatService.createChatRoom(productId, userId)
+                )
+        );
     }
 
     @PostMapping("/chat")
@@ -52,26 +56,35 @@ public class ChatController {
 
 
     @GetMapping("/{roomToken}/messages")
-    public ResponseEntity<ChatMessageResponseDto> getChatMessages(
+    public ResponseEntity<ApiResponse<ChatMessageResponseDto>> getChatMessages(
             @PathVariable String roomToken,
             @AuthenticationPrincipal Long userId,
             @RequestParam(value = "cursorId", required = false) ObjectId cursorId,
             @RequestParam(defaultValue = "20") int limit
     ) {
-        return ResponseEntity.ok(chatService.getMessagesByRoomToken(roomToken, userId, cursorId, limit));
+        return ResponseEntity.ok(new ApiResponse<>(
+                        chatService.getMessagesByRoomToken(roomToken, userId, cursorId, limit)
+                )
+        );
     }
 
     @GetMapping("/{roomToken}/messages/recent")
-    public ResponseEntity<ChatMessageResponseDto> getRecentChatMessages(
+    public ResponseEntity<ApiResponse<ChatMessageResponseDto>> getRecentChatMessages(
             @PathVariable String roomToken
     ) {
-        return ResponseEntity.ok(chatService.getRecentMessagesByRoomToken(roomToken));
+        return ResponseEntity.ok(new ApiResponse<>(
+                        chatService.getRecentMessagesByRoomToken(roomToken)
+                )
+        );
     }
 
     @GetMapping("/chatRoomList")
-    public ResponseEntity<List<ChatRoomListDto>> getChatRoomList(
+    public ResponseEntity<ApiResponse<List<ChatRoomListDto>>> getChatRoomList(
             @AuthenticationPrincipal Long userId
     ) {
-        return ResponseEntity.ok(chatService.getChatRoomList(userId));
+        return ResponseEntity.ok(new ApiResponse<>(
+                        chatService.getChatRoomList(userId)
+                )
+        );
     }
 }
