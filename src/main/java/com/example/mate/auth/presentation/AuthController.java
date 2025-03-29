@@ -3,6 +3,7 @@ package com.example.mate.auth.presentation;
 import com.example.mate.auth.application.AuthService;
 import com.example.mate.auth.application.dto.TokenResponseDto;
 import com.example.mate.common.presentation.cookie.CookieHandler;
+import com.example.mate.common.response.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
@@ -27,7 +28,7 @@ public class AuthController {
     private final CookieHandler cookieHandler;
 
     @PostMapping("/reissue")
-    public ResponseEntity<TokenResponseDto> reissue(
+    public ResponseEntity<ApiResponse<TokenResponseDto>> reissue(
             @CookieValue(COOKIE_REFRESH_TOKEN) String refreshToken,
             HttpServletResponse response
     ) {
@@ -39,7 +40,9 @@ public class AuthController {
 
         response.addHeader(SET_COOKIE, cookie.toString());
 
-        return ResponseEntity.ok(tokenPairResponse);
+        return ResponseEntity.ok(new ApiResponse<>(
+                tokenPairResponse)
+        );
     }
 
     @PostMapping("/logout")
@@ -51,7 +54,7 @@ public class AuthController {
         authService.logout(userId, refreshToken);
 
         ResponseCookie cookie = cookieHandler.deleteCookie(COOKIE_REFRESH_TOKEN);
-        
+
         response.addHeader(SET_COOKIE, cookie.toString());
         return ResponseEntity.ok(null);
     }
