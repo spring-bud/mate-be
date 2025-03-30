@@ -26,7 +26,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "LEFT JOIN FETCH p.productTags pt " +
             "LEFT JOIN FETCH pt.tag " +
             "WHERE u.status != 'DELETED'" +
-            "AND p.status != 'DELETED'")
+            "AND p.status != 'DELETED'" +
+            "ORDER BY p.createdAt DESC")
     List<Product> findWithUserAndTags();
 
     @Query("SELECT p FROM Product p " +
