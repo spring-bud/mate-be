@@ -10,7 +10,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
@@ -43,10 +42,6 @@ public class RedisConfig {
         template.setKeySerializer(new StringRedisSerializer());
 
         template.setValueSerializer(new GenericToStringSerializer<>(Object.class));
-
-        template.setHashKeySerializer(new StringRedisSerializer());
-
-        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, String.class));
 
         return template;
     }

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -74,6 +75,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/users/{userId}").permitAll()
                         .requestMatchers("/api/v1/products/{productId}").permitAll()
                         .requestMatchers("/api/v1/products/users/{userId}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/products").permitAll()
                         .requestMatchers("/api/v1/users/popularity").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -114,6 +116,7 @@ public class SecurityConfig {
                         new AntPathRequestMatcher("/api/v1/users/{userId}", "GET"),
                         new AntPathRequestMatcher("/api/v1/products/{productId}", "GET"),
                         new AntPathRequestMatcher("/api/v1/products/users/{userId}", "GET"),
+                        new AntPathRequestMatcher("/api/v1/products", "GET"),
                         new AntPathRequestMatcher("/api/v1/users/popularity", "GET")
                 )
         );

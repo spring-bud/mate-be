@@ -33,16 +33,16 @@ public class LikeScheduler {
             for (Object productId : setProductId) {
                 HashOperations<String, Long, Long> hashOperations = redisTemplate.opsForHash();
                 Set<Long> hashUserIds = hashOperations.keys(String.valueOf(productId));
-
+                Long longProductId = Long.valueOf(String.valueOf(productId));
                 for (Long userId : hashUserIds) {
                     User findUser = userService.getUserById(Math.abs(userId));
-                    Product findProduct = productService.findProductById((Long) productId);
+                    Product findProduct = productService.findProductById(longProductId);
 
                     if (userId > 0) {
                         Like newLike = new Like(findUser, findProduct);
                         likeRepository.save(newLike);
                     } else {
-                        Like newLike = likeService.getExistingLike(Math.abs(userId), (Long) productId);
+                        Like newLike = likeService.getExistingLike(Math.abs(userId), longProductId);
                         likeRepository.delete(newLike);
                     }
                 }

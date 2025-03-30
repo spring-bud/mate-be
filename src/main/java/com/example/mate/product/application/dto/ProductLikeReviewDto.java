@@ -2,18 +2,15 @@ package com.example.mate.product.application.dto;
 
 public record ProductLikeReviewDto(
         Long likeCount,
-        Long reviewCount,
-        boolean likeStatus
+        Long reviewCount
 ) {
     public static ProductLikeReviewDto of(
             Long likeCount,
-            Long reviewCount,
-            boolean likeStatus
+            Long reviewCount
     ) {
         return new ProductLikeReviewDto(
                 likeCount,
-                reviewCount,
-                likeStatus
+                reviewCount
         );
     }
 }
