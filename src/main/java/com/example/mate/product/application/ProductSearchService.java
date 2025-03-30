@@ -1,9 +1,11 @@
 package com.example.mate.product.application;
 
 
+import com.example.mate.auth.infrastructure.jwt.JwtProvider;
 import com.example.mate.product.application.dto.ProductAllResponseDto;
 import com.example.mate.product.application.dto.ProductDetailResponseDto;
 import com.example.mate.product.application.dto.ProductLikeReviewDto;
+import com.example.mate.product.application.dto.ProductSrchRequestDto;
 import com.example.mate.product.domain.Product;
 import com.example.mate.product.domain.repository.ProductRepository;
 import com.example.mate.review.application.ReviewService;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,43 +25,66 @@ public class ProductSearchService {
     private final LikeService likeService;
     private final ProductService productService;
     private final ProductRepository productRepository;
+    private final JwtProvider jwtProvider;
 
 
     @Transactional
     public ProductDetailResponseDto getProductById(
             Long productId,
-            Long userId
+            String accessToken
     ) {
 
         Product findProduct = productService.findProductById(productId);
-        ProductLikeReviewDto likeReviewInfo = likeReviewInfo(productId, userId);
+        ProductLikeReviewDto likeReviewInfo = likeReviewInfo(productId);
+        Long userId = -1L;
+        if (accessToken == null || accessToken == "") {
+            userId = -1L;
+        } else {
+            userId = jwtProvider.getUserIdFromAccessToken(accessToken);
+        }
+
+        boolean likeStatus = false;
+
+        if (userId != -1) {
+            likeStatus = likeService.getLikeStatus(productId, userId);
+        }
 
         return ProductDetailResponseDto.of(
                 findProduct,
                 likeReviewInfo.likeCount(),
                 likeReviewInfo.reviewCount(),
-                likeReviewInfo.likeStatus()
+                likeStatus
         );
     }
 
     @Transactional
     public List<ProductAllResponseDto> getProductByUserId(
-            Long userId
+            Long userId,
+            String accessToken
     ) {
         //TODO: 나중에 필요하면
         //Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Order.desc("createdAt")));
+
+        Long loginId = -1L;
+        if (accessToken == null || accessToken == "") {
+            loginId = -1L;
+        } else {
+            loginId = jwtProvider.getUserIdFromAccessToken(accessToken);
+        }
+
+        AtomicLong myVar = new AtomicLong(loginId);
 
         List<Product> findProducts = productRepository.findByUserId(userId);
 
         List<ProductAllResponseDto> productAll = findProducts.stream()
                 .map(product -> {
-                    ProductLikeReviewDto likeReviewInfo = likeReviewInfo(product.getId(), userId);
-
+                    ProductLikeReviewDto likeReviewInfo = likeReviewInfo(product.getId());
+                    boolean likeStatus = likeService.getLikeStatus(product.getId(), myVar.get());
                     return ProductAllResponseDto.of(
                             product,
                             likeReviewInfo.likeCount(),
                             likeReviewInfo.reviewCount(),
-                            likeReviewInfo.likeStatus()
+                            likeStatus
                     );
                 })
                 .collect(Collectors.toList());
@@ -67,35 +93,58 @@ public class ProductSearchService {
     }
 
     @Transactional
-    public List<ProductAllResponseDto> getProduct(
-            Long userId
+    public List<ProductAllResponseDto> getProducts(
+            String accessToken,
+            ProductSrchRequestDto request
     ) {
         //TODO: 나중에 필요하면
         //Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Order.desc("createdAt")));
+        Long userId = -1L;
+        if (accessToken == null || accessToken == "") {
+            userId = -1L;
+        } else {
+            userId = jwtProvider.getUserIdFromAccessToken(accessToken);
+        }
+
+        AtomicLong myVar = new AtomicLong(userId);
 
         List<Product> findProducts = productRepository.findWithUserAndTags();
 
         List<ProductAllResponseDto> productAll = findProducts.stream()
                 .map(product -> {
-                    ProductLikeReviewDto likeReviewInfo = likeReviewInfo(product.getId(), userId);
+                    ProductLikeReviewDto likeReviewInfo = likeReviewInfo(product.getId());
+                    boolean likeStatus = false;
+
+                    if (myVar.get() != -1) {
+                        likeStatus = likeService.getLikeStatus(product.getId(), myVar.get());
+                    }
 
                     return ProductAllResponseDto.of(
                             product,
                             likeReviewInfo.likeCount(),
                             likeReviewInfo.reviewCount(),
-                            likeReviewInfo.likeStatus()
+                            likeStatus
                     );
+                })
+                .sorted((dto1, dto2) -> {
+                    if ("like".equals(request.sort())) {
+                        // likeCount 기준으로 정렬
+                        return Long.compare(dto2.count().likeCount(), dto1.count().likeCount()); // 내림차순
+                    } else if ("review".equals(request.sort())) {
+                        // reviewCount 기준으로 정렬
+                        return Long.compare(dto2.count().reviewCount(), dto1.count().reviewCount()); // 내림차순
+                    }
+                    return 0; // 기본값 (정렬 기준이 없을 경우)
                 })
                 .collect(Collectors.toList());
 
         return productAll;
     }
 
-    private ProductLikeReviewDto likeReviewInfo(Long productId, Long userId) {
+    private ProductLikeReviewDto likeReviewInfo(Long productId) {
         Long likeCount = likeService.countLike(productId);
         Long reviewCount = reviewService.countReview(productId);
-        boolean likeStatus = likeService.getLikeStatus(productId, userId);
 
-        return ProductLikeReviewDto.of(likeCount, reviewCount, likeStatus);
+        return ProductLikeReviewDto.of(likeCount, reviewCount);
     }
 }
