@@ -4,10 +4,7 @@ import com.example.mate.common.response.ApiResponse;
 import com.example.mate.product.application.LikeService;
 import com.example.mate.product.application.ProductSearchService;
 import com.example.mate.product.application.ProductService;
-import com.example.mate.product.application.dto.ProductAllResponseDto;
-import com.example.mate.product.application.dto.ProductCreateRequestDto;
-import com.example.mate.product.application.dto.ProductDetailResponseDto;
-import com.example.mate.product.application.dto.ProductIdResponseDto;
+import com.example.mate.product.application.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,6 +20,8 @@ import java.util.List;
 @Slf4j
 public class ProductController {
 
+    private final String COOKIE_ACCESS_TOKEN = "access_token";
+
     private final ProductService productService;
     private final LikeService likeService;
     private final ProductSearchService productSearchService;
@@ -36,27 +35,29 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(productIdResponse));
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping
     public ResponseEntity<ApiResponse<List<ProductAllResponseDto>>> getProducts(
-            @PathVariable Long userId
+            @CookieValue(value = COOKIE_ACCESS_TOKEN, required = false) String accessToken,
+            @RequestBody ProductSrchRequestDto srchRequest
     ) {
-        return ResponseEntity.ok(new ApiResponse<>(productSearchService.getProduct(userId)));
+        return ResponseEntity.ok(new ApiResponse<>(productSearchService.getProducts(accessToken, srchRequest)));
     }
 
     @GetMapping("/users/{userId}")
     public ResponseEntity<ApiResponse<List<ProductAllResponseDto>>> getProductsByUserID(
+            @CookieValue(value = COOKIE_ACCESS_TOKEN, required = false) String accessToken,
             @PathVariable Long userId
     ) {
-        return ResponseEntity.ok(new ApiResponse<>(productSearchService.getProductByUserId(userId)));
+        return ResponseEntity.ok(new ApiResponse<>(productSearchService.getProductByUserId(userId, accessToken)));
     }
 
-    @GetMapping("/{productId}/{userId}")
+    @GetMapping("/{productId}")
     public ResponseEntity<ApiResponse<ProductDetailResponseDto>> getProductById(
-            @PathVariable Long userId,
+            @CookieValue(value = COOKIE_ACCESS_TOKEN, required = false) String accessToken,
             @PathVariable Long productId
     ) {
 
-        return ResponseEntity.ok(new ApiResponse<>(productSearchService.getProductById(productId, userId)));
+        return ResponseEntity.ok(new ApiResponse<>(productSearchService.getProductById(productId, accessToken)));
     }
 
     @PostMapping("/like/{productId}")
