@@ -2,9 +2,11 @@ package com.example.mate.auth.infrastructure.jwt;
 
 import com.example.mate.auth.application.TokenProvider;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -59,5 +61,25 @@ public class JwtProvider implements TokenProvider {
                 .setExpiration(new Date(now + exp))  //만료시간
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    // JWT 디코딩 및 Claims 추출 메서드 추가
+    public Claims parseClaims(String token) throws JwtException {
+        try {
+            Jws<Claims> jws = Jwts.parserBuilder()
+                    .setSigningKey(key) // 비밀키를 설정
+                    .build()
+                    .parseClaimsJws(token); // JWT를 파싱하여 Claims를 추출
+
+            return jws.getBody();
+        } catch (JwtException e) {
+            throw new JwtException("Invalid JWT token", e); // JWT 예외 처리
+        }
+    }
+
+    // JWT에서 사용자 ID 추출
+    public Long getUserIdFromAccessToken(String token) {
+        Claims claims = parseClaims(token);
+        return claims.containsKey(USER_ID) ? claims.get(USER_ID, Long.class) : null;
     }
 }
