@@ -8,6 +8,7 @@ import com.example.mate.product.application.dto.ProductLikeReviewDto;
 import com.example.mate.product.application.dto.ProductSrchRequestDto;
 import com.example.mate.product.domain.Product;
 import com.example.mate.product.domain.repository.ProductRepository;
+import com.example.mate.product.domain.repository.ProductSrchRepository;
 import com.example.mate.review.application.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class ProductSearchService {
     private final ProductService productService;
     private final ProductRepository productRepository;
     private final JwtProvider jwtProvider;
+    private final ProductSrchRepository productSrchRepository;
 
 
     @Transactional
@@ -108,7 +110,7 @@ public class ProductSearchService {
 
         AtomicLong myVar = new AtomicLong(userId);
 
-        List<Product> findProducts = productRepository.findWithUserAndTags();
+        List<Product> findProducts = productSrchRepository.findWithUserAndTags(request);
 
         List<ProductAllResponseDto> productAll = findProducts.stream()
                 .map(product -> {
@@ -127,12 +129,12 @@ public class ProductSearchService {
                     );
                 })
                 .sorted((dto1, dto2) -> {
-                    if ("like".equals(request.sort())) {
+                    if ("LIKE".equals(request.sort())) {
                         // likeCount 기준으로 정렬
                         return Long.compare(dto2.count().likeCount(), dto1.count().likeCount()); // 내림차순
-                    } else if ("review".equals(request.sort())) {
+                    } else if ("CREATE".equals(request.sort())) {
                         // reviewCount 기준으로 정렬
-                        return Long.compare(dto2.count().reviewCount(), dto1.count().reviewCount()); // 내림차순
+                        return dto2.createdAt().compareTo(dto1.createdAt()); // 내림차순
                     }
                     return 0; // 기본값 (정렬 기준이 없을 경우)
                 })
