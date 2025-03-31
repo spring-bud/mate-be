@@ -6,6 +6,7 @@ import com.example.mate.product.domain.ProductStatus;
 import com.example.mate.product.domain.ProductTag;
 import com.example.mate.user.domain.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record ProductAllResponseDto(
@@ -16,6 +17,7 @@ public record ProductAllResponseDto(
         ProductCategory category,
         ProductStatus status,
         List<ProductAllResponseDto.ProductTagInfo> productTags,
+        LocalDateTime createdAt,
         ProductAllResponseDto.OwnerInfo owner,
         ProductAllResponseDto.CountInfo count,
         Boolean isLiked
@@ -37,6 +39,7 @@ public record ProductAllResponseDto(
                 product.getProductTags().stream()
                         .map(ProductAllResponseDto.ProductTagInfo::from)
                         .toList(),
+                product.getCreatedAt(),
                 ProductAllResponseDto.OwnerInfo.of(product.getUser()),
                 ProductAllResponseDto.CountInfo.of(likeCount, reviewCount),
                 isLiked
