@@ -46,4 +46,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
              WHERE p.user.id = :userId
             """)
     void updateStatusdByUsertId(Long userId);
+
+    @Query("SELECT p FROM Product p " +
+            "LEFT JOIN FETCH p.user u " +
+            "LEFT JOIN FETCH p.productTags pt " +
+            "LEFT JOIN FETCH pt.tag t " +
+            "WHERE p.id IN (SELECT pt2.product.id FROM ProductTag pt2 " +
+            "               JOIN pt2.tag tt WHERE tt.name = :tagName)" +
+            "AND u.status != 'DELETED' " +
+            "AND p.status != 'DELETED'")
+    List<Product> findByTag(@Param("tagName") String tagName);
+
 }
