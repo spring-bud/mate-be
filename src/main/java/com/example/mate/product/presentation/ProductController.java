@@ -51,6 +51,14 @@ public class ProductController {
         return ResponseEntity.ok(new ApiResponse<>(productSearchService.getProductByUserId(userId, accessToken)));
     }
 
+    @GetMapping("/tagName")
+    public ResponseEntity<ApiResponse<List<ProductAllResponseDto>>> getProductsByTagName(
+            @CookieValue(value = COOKIE_ACCESS_TOKEN, required = false) String accessToken,
+            @RequestBody ProductTagRequestDto tagName
+    ) {
+        return ResponseEntity.ok(new ApiResponse<>(productSearchService.getProductByTagName(tagName, accessToken)));
+    }
+
     @GetMapping("/{productId}")
     public ResponseEntity<ApiResponse<ProductDetailResponseDto>> getProductById(
             @CookieValue(value = COOKIE_ACCESS_TOKEN, required = false) String accessToken,

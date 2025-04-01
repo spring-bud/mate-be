@@ -2,10 +2,7 @@ package com.example.mate.product.application;
 
 
 import com.example.mate.auth.infrastructure.jwt.JwtProvider;
-import com.example.mate.product.application.dto.ProductAllResponseDto;
-import com.example.mate.product.application.dto.ProductDetailResponseDto;
-import com.example.mate.product.application.dto.ProductLikeReviewDto;
-import com.example.mate.product.application.dto.ProductSrchRequestDto;
+import com.example.mate.product.application.dto.*;
 import com.example.mate.product.domain.Product;
 import com.example.mate.product.domain.repository.ProductRepository;
 import com.example.mate.product.domain.repository.ProductSrchRepository;
@@ -137,6 +134,41 @@ public class ProductSearchService {
                         return dto2.createdAt().compareTo(dto1.createdAt()); // 내림차순
                     }
                     return 0; // 기본값 (정렬 기준이 없을 경우)
+                })
+                .collect(Collectors.toList());
+
+        return productAll;
+    }
+
+    @Transactional
+    public List<ProductAllResponseDto> getProductByTagName(
+            ProductTagRequestDto tagName,
+            String accessToken
+    ) {
+        //TODO: 나중에 필요하면
+        //Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Order.desc("createdAt")));
+
+        Long loginId = -1L;
+        if (accessToken == null || accessToken == "") {
+            loginId = -1L;
+        } else {
+            loginId = jwtProvider.getUserIdFromAccessToken(accessToken);
+        }
+
+        AtomicLong myVar = new AtomicLong(loginId);
+
+        List<Product> findProducts = productRepository.findByTag(tagName.tag());
+
+        List<ProductAllResponseDto> productAll = findProducts.stream()
+                .map(product -> {
+                    ProductLikeReviewDto likeReviewInfo = likeReviewInfo(product.getId());
+                    boolean likeStatus = likeService.getLikeStatus(product.getId(), myVar.get());
+                    return ProductAllResponseDto.of(
+                            product,
+                            likeReviewInfo.likeCount(),
+                            likeReviewInfo.reviewCount(),
+                            likeStatus
+                    );
                 })
                 .collect(Collectors.toList());
 
