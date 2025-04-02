@@ -141,38 +141,13 @@ public class ProductSearchService {
     }
 
     @Transactional
-    public List<ProductAllResponseDto> getProductByTagName(
-            ProductTagRequestDto tagName,
-            String accessToken
+    public List<String> getProductByTagName(
+            ProductTagRequestDto tagName
     ) {
-        //TODO: 나중에 필요하면
-        //Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Order.desc("createdAt")));
 
-        Long loginId = -1L;
-        if (accessToken == null || accessToken == "") {
-            loginId = -1L;
-        } else {
-            loginId = jwtProvider.getUserIdFromAccessToken(accessToken);
-        }
+        List<String> findTags = productRepository.findByTag(tagName.tag());
 
-        AtomicLong myVar = new AtomicLong(loginId);
-
-        List<Product> findProducts = productRepository.findByTag(tagName.tag());
-
-        List<ProductAllResponseDto> productAll = findProducts.stream()
-                .map(product -> {
-                    ProductLikeReviewDto likeReviewInfo = likeReviewInfo(product.getId());
-                    boolean likeStatus = likeService.getLikeStatus(product.getId(), myVar.get());
-                    return ProductAllResponseDto.of(
-                            product,
-                            likeReviewInfo.likeCount(),
-                            likeReviewInfo.reviewCount(),
-                            likeStatus
-                    );
-                })
-                .collect(Collectors.toList());
-
-        return productAll;
+        return findTags;
     }
 
     @Transactional
