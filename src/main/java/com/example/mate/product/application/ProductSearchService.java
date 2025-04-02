@@ -175,6 +175,21 @@ public class ProductSearchService {
         return productAll;
     }
 
+    @Transactional
+    public List<ProductMostTagRequestDto> getMostTag(
+    ) {
+
+        List<Object[]> findMostTag = productRepository.mostten();
+
+        return findMostTag.stream()
+                .limit(10)
+                .map(obj -> new ProductMostTagRequestDto(
+                        (String) obj[0],  // 첫 번째 값은 tag 이름 (String)
+                        ((Number) obj[1]).intValue()  // 두 번째 값은 tagCount (int)
+                ))
+                .collect(Collectors.toList());
+    }
+
     private ProductLikeReviewDto likeReviewInfo(Long productId) {
         Long likeCount = likeService.countLike(productId);
         Long reviewCount = reviewService.countReview(productId);

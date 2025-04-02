@@ -57,4 +57,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "AND p.status != 'DELETED'")
     List<Product> findByTag(@Param("tagName") String tagName);
 
+    @Query("SELECT t.name, COUNT(pt) AS tagCount " +
+            "FROM ProductTag pt " +
+            "JOIN pt.tag t " +
+            "GROUP BY t.name " +
+            "ORDER BY tagCount DESC")
+    List<Object[]> mostten();
+
 }

@@ -59,6 +59,12 @@ public class ProductController {
         return ResponseEntity.ok(new ApiResponse<>(productSearchService.getProductByTagName(tagName, accessToken)));
     }
 
+    @GetMapping("/mostTag")
+    public ResponseEntity<ApiResponse<List<ProductMostTagRequestDto>>> getMostTag(
+    ) {
+        return ResponseEntity.ok(new ApiResponse<>(productSearchService.getMostTag()));
+    }
+
     @GetMapping("/{productId}")
     public ResponseEntity<ApiResponse<ProductDetailResponseDto>> getProductById(
             @CookieValue(value = COOKIE_ACCESS_TOKEN, required = false) String accessToken,

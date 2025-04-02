@@ -77,6 +77,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/products/users/{userId}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/products").permitAll()
                         .requestMatchers("/api/v1/products/tagName").permitAll()
+                        .requestMatchers("/api/v1/products/mostTag").permitAll()
                         .requestMatchers("/api/v1/users/popularity").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -119,6 +120,7 @@ public class SecurityConfig {
                         new AntPathRequestMatcher("/api/v1/products/users/{userId}", "GET"),
                         new AntPathRequestMatcher("/api/v1/products", "GET"),
                         new AntPathRequestMatcher("/api/v1/products/tagName", "GET"),
+                        new AntPathRequestMatcher("/api/v1/products/mostTag", "GET"),
                         new AntPathRequestMatcher("/api/v1/users/popularity", "GET")
                 )
         );
