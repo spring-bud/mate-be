@@ -47,15 +47,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             """)
     void updateStatusdByUsertId(Long userId);
 
-    @Query("SELECT p FROM Product p " +
-            "LEFT JOIN FETCH p.user u " +
-            "LEFT JOIN FETCH p.productTags pt " +
-            "LEFT JOIN FETCH pt.tag t " +
-            "WHERE p.id IN (SELECT pt2.product.id FROM ProductTag pt2 " +
-            "               JOIN pt2.tag tt WHERE tt.name = :tagName)" +
+    @Query("SELECT Distinct(t.name) FROM Product p " +
+            "LEFT JOIN p.productTags pt " +
+            "LEFT JOIN pt.tag t " +
+            "LEFT JOIN p.user u " +
+            "WHERE t.name like CONCAT('%', :tagName, '%') " +
             "AND u.status != 'DELETED' " +
             "AND p.status != 'DELETED'")
-    List<Product> findByTag(@Param("tagName") String tagName);
+    List<String> findByTag(@Param("tagName") String tagName);
 
     @Query("SELECT t.name, COUNT(pt) AS tagCount " +
             "FROM ProductTag pt " +
