@@ -46,7 +46,7 @@ spring:
         enabled: false
 
     mongodb:
-      uri: mongodb://root:root@localhost:27017/mate-local-db?authSource=admin
+      uri: mongodb://root:root@mongo7:27017/mate-local-db?authSource=admin
       database: mate-local-db
       auto-index-creation: true
       authentication-database: admin
