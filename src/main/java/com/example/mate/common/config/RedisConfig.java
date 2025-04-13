@@ -9,7 +9,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.serializer.GenericToStringSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
@@ -36,12 +36,13 @@ public class RedisConfig {
             RedisConnectionFactory redisConnectionFactory
     ) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
-
         template.setConnectionFactory(redisConnectionFactory);
 
+        // Key는 String, Value는 JSON 직렬화
         template.setKeySerializer(new StringRedisSerializer());
-
-        template.setValueSerializer(new GenericToStringSerializer<>(Object.class));
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
+        template.setHashKeySerializer(new Jackson2JsonRedisSerializer<>(Object.class));
+        template.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
 
         return template;
     }
