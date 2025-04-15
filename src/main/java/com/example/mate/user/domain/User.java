@@ -37,8 +37,8 @@ public class User extends BaseTimeEntity {
     @Column(columnDefinition = "TEXT", name = "reason_detail")
     private String reasonDetail;
 
-    @Enumerated(EnumType.STRING)
-    private UserJobType jobType;
+    @Column(name = "job_type")
+    private String jobType;
 
     @Column(name = "job_year")
     private Integer jobYear;
@@ -103,7 +103,7 @@ public class User extends BaseTimeEntity {
     }
 
     public void updateUserInfoAll(
-            UserJobType jobType,
+            String jobType,
             Integer jobYear,
             String intro,
             String email,

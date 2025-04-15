@@ -1,7 +1,6 @@
 package com.example.mate.user.application.dto;
 
 import com.example.mate.user.domain.User;
-import com.example.mate.user.domain.UserJobType;
 import com.example.mate.user.domain.UserStack;
 
 import java.util.List;
@@ -10,7 +9,7 @@ public record PopularityUserInfoResponseDto(
         Long id,
         String nickname,
         String profileUrl,
-        UserJobType jobType,
+        String jobType,
         long count,
         double star,
         List<UserStackInfo> userStacks

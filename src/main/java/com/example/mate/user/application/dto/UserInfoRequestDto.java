@@ -1,6 +1,5 @@
 package com.example.mate.user.application.dto;
 
-import com.example.mate.user.domain.UserJobType;
 import com.example.mate.user.domain.UserStatus;
 
 import java.util.List;
@@ -10,7 +9,7 @@ public record UserInfoRequestDto(
         UserStatus userStatus,
         String nickname,
         String profileUrl,
-        UserJobType jobType,
+        String jobType,
         Integer jobYear,
         String intro,
         String email,
