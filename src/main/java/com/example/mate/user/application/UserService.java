@@ -89,7 +89,7 @@ public class UserService {
                 request.blogUrl()
         );
 
-        List<Stack> stacks = stackService.findOrCreateStacks(request.stacks());
+        List<Stack> stacks = stackService.findOrCreateStacks(request.user_stacks());
         stacks.forEach(findUser::addStack);
 
         User updateUser = userRepository.save(findUser);
