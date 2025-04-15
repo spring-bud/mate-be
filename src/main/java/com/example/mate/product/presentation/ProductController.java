@@ -35,7 +35,7 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(productIdResponse));
     }
 
-    @GetMapping
+    @PostMapping("/srch")
     public ResponseEntity<ApiResponse<List<ProductAllResponseDto>>> getProducts(
             @CookieValue(value = COOKIE_ACCESS_TOKEN, required = false) String accessToken,
             @RequestBody ProductSrchRequestDto srchRequest
