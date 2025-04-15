@@ -73,6 +73,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/reissue").permitAll()
                         .requestMatchers("/oauth2/authorization/kakao").permitAll()
                         .requestMatchers("/api/v1/users/{userId}").permitAll()
+                        .requestMatchers("/api/v1/products/srch").permitAll()
                         .requestMatchers("/api/v1/products/{productId}").permitAll()
                         .requestMatchers("/api/v1/products/users/{userId}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/products").permitAll()
@@ -116,6 +117,7 @@ public class SecurityConfig {
                         new AntPathRequestMatcher("/api/v1/auth/reissue"),
                         new AntPathRequestMatcher("/oauth2/authorization/kakao"),
                         new AntPathRequestMatcher("/api/v1/users/{userId}", "GET"),
+                        new AntPathRequestMatcher("/api/v1/products/srch"),
                         new AntPathRequestMatcher("/api/v1/products/{productId}", "GET"),
                         new AntPathRequestMatcher("/api/v1/products/users/{userId}", "GET"),
                         new AntPathRequestMatcher("/api/v1/products", "GET"),
