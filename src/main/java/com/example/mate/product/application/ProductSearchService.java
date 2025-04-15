@@ -8,6 +8,9 @@ import com.example.mate.product.domain.repository.ProductRepository;
 import com.example.mate.product.domain.repository.ProductSrchRepository;
 import com.example.mate.review.application.ReviewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,12 +95,12 @@ public class ProductSearchService {
     }
 
     @Transactional
-    public List<ProductAllResponseDto> getProducts(
+    public ProductPageResponseDto getProducts(
             String accessToken,
             ProductSrchRequestDto request
     ) {
         //TODO: 나중에 필요하면
-        //Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Order.desc("createdAt")));
+        Pageable pageable = PageRequest.of(request.page(), request.size());
         Long userId = -1L;
         if (accessToken == null || accessToken == "") {
             userId = -1L;
@@ -107,7 +110,7 @@ public class ProductSearchService {
 
         AtomicLong myVar = new AtomicLong(userId);
 
-        List<Product> findProducts = productSrchRepository.findWithUserAndTags(request);
+        Page<Product> findProducts = productSrchRepository.findWithUserAndTags(request, pageable);
 
         List<ProductAllResponseDto> productAll = findProducts.stream()
                 .map(product -> {
@@ -137,7 +140,7 @@ public class ProductSearchService {
                 })
                 .collect(Collectors.toList());
 
-        return productAll;
+        return new ProductPageResponseDto(productAll, findProducts.getNumber(), findProducts.hasNext());
     }
 
     @Transactional

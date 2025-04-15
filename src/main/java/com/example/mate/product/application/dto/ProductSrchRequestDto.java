@@ -6,6 +6,8 @@ public record ProductSrchRequestDto(
         String category,
         String sort,
         List<String> tag,
-        String title
+        String title,
+        int size,
+        int page
 ) {
 }
