@@ -170,4 +170,21 @@ public class User extends BaseTimeEntity {
     public void removeStack(Stack stack) {
         userStacks.removeIf(userStack -> userStack.getStack().equals(stack));
     }
+
+    public void syncStacks(List<Stack> newStacks) {
+        List<Stack> currentStacks = userStacks.stream()
+                .map(UserStack::getStack)
+                .toList();
+
+        List<Stack> toRemove = currentStacks.stream()
+                .filter(existing -> !newStacks.contains(existing))
+                .toList();
+
+        List<Stack> toAdd = newStacks.stream()
+                .filter(newStack -> !currentStacks.contains(newStack))
+                .toList();
+
+        toRemove.forEach(this::removeStack);
+        toAdd.forEach(this::addStack);
+    }
 }
