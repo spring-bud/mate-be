@@ -90,7 +90,8 @@ public class UserService {
         );
 
         List<Stack> stacks = stackService.findOrCreateStacks(request.user_stacks());
-        stacks.forEach(findUser::addStack);
+
+        findUser.syncStacks(stacks);
 
         User updateUser = userRepository.save(findUser);
         eventPublisher.publishEvent(UserUpdateEvent.of(updateUser));
