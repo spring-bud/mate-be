@@ -63,6 +63,6 @@ public class ProposalController {
             @PathVariable Long proposalId
     ) {
         proposalService.deleteProposalByIdAndUserId(userId, proposalId);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.noContent().build();
     }
 }
