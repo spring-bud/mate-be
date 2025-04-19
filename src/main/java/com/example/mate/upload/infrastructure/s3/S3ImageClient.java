@@ -21,6 +21,13 @@ public class S3ImageClient implements ImageClient {
         return generatedImageUrl(objectKey);
     }
 
+    @Override
+    public String uploadFile(String objectKey, MultipartFile file, int cacheSeconds) {
+        String bucketName = properties.bucketName();
+        s3Uploader.upload(cacheSeconds, bucketName, objectKey, file);
+        return generatedImageUrl(objectKey);
+    }
+
     private String generatedImageUrl(String objectKey) {
         return properties.imageUrl() + objectKey;
     }
