@@ -55,7 +55,7 @@ public class ChatMessageService {
         messageEventPublisher.execute(messageInfoDto);
     }
 
-    private ChatMessageInfoDto createAndSaveMessage(Long userId, ChatMessageDto message) {
+    public ChatMessageInfoDto createAndSaveMessage(Long userId, ChatMessageDto message) {
         ChatUser findUser = chatUserRepository.findByUserId(userId)
                 .orElseThrow(() -> new ChatException(INVALID_CHAT_USER_ID_EXCEPTION));
         ChatMessage chatMessage = ChatMessage.builder()
