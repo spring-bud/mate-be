@@ -2,7 +2,9 @@ package com.example.mate.review.application;
 
 import com.example.mate.product.application.ProductService;
 import com.example.mate.product.domain.Product;
+import com.example.mate.review.application.dto.ReviewDeleteResponseDto;
 import com.example.mate.review.application.dto.ReviewResponseDto;
+import com.example.mate.review.application.dto.ReviewUserIdResponseDto;
 import com.example.mate.review.application.dto.ReviewUserResponseDto;
 import com.example.mate.review.domain.Review;
 import com.example.mate.review.domain.repository.ReviewRepository;
@@ -65,10 +67,11 @@ public class ReviewService {
         return reviewAll;
     }
 
-    public List<ReviewUserResponseDto> getReviewByUserId(Long userId) {
+    public List<ReviewUserResponseDto> getReviewByUserId(ReviewUserIdResponseDto request) {
         //TODO: 나중에 필요하면
         //Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Order.desc("createdAt"))) ;
-        List<Review> findUserReviews = reviewRepository.findByUserId(userId);
+
+        List<Review> findUserReviews = reviewRepository.findByUserId(request.userid());
 
         List<ReviewUserResponseDto> reviewAll = findUserReviews.stream()
                 .map(review -> {
@@ -101,10 +104,11 @@ public class ReviewService {
     }
 
     @Transactional
-    public void deleteReviewByIdAndUserId(Long reviewId, Long userId) {
-        Review findReview = findById(reviewId);
+    public void deleteReviewByIdAndUserId(ReviewDeleteResponseDto request, Long userId) {
+        Review findReview = findById(request.reviewid());
 
-        findReview.isOwnerOrThrow(userId);
+
+        findReview.isDeleteOwnerOrThrow(userId, request.productownerid());
 
         findReview.softDelete();
 
