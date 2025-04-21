@@ -121,7 +121,7 @@ public class SecurityConfig {
                         new AntPathRequestMatcher("/api/v1/products/{productId}", "GET"),
                         new AntPathRequestMatcher("/api/v1/products/users/{userId}", "GET"),
                         new AntPathRequestMatcher("/api/v1/products", "GET"),
-                        new AntPathRequestMatcher("/api/v1/products/tagName", "PSOT"),
+                        new AntPathRequestMatcher("/api/v1/products/tagName", "POST"),
                         new AntPathRequestMatcher("/api/v1/products/mostTag", "GET"),
                         new AntPathRequestMatcher("/api/v1/users/popularity", "GET")
                 )
