@@ -2,7 +2,9 @@ package com.example.mate.review.presentation;
 
 import com.example.mate.common.response.ApiResponse;
 import com.example.mate.review.application.ReviewService;
+import com.example.mate.review.application.dto.ReviewDeleteResponseDto;
 import com.example.mate.review.application.dto.ReviewResponseDto;
+import com.example.mate.review.application.dto.ReviewUserIdResponseDto;
 import com.example.mate.review.application.dto.ReviewUserResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,18 +31,17 @@ public class ReviewController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(reviewResponseDto));
     }
 
-    @GetMapping
+    @PostMapping
     public ResponseEntity<ApiResponse<List<ReviewUserResponseDto>>> getUserReview(
-            @AuthenticationPrincipal Long userId
+            @RequestBody ReviewUserIdResponseDto request
     ) {
         return ResponseEntity.ok(new ApiResponse<>(
-                reviewService.getReviewByUserId(userId))
+                reviewService.getReviewByUserId(request))
         );
     }
 
     @GetMapping("/{productId}")
     public ResponseEntity<ApiResponse<List<ReviewUserResponseDto>>> getProductReview(
-            @AuthenticationPrincipal Long userId,
             @PathVariable Long productId
     ) {
         return ResponseEntity.ok(new ApiResponse<>(
@@ -58,12 +59,12 @@ public class ReviewController {
         );
     }
 
-    @DeleteMapping("/{reviewId}")
+    @DeleteMapping
     public ResponseEntity<Void> deleteReviewById(
             @AuthenticationPrincipal Long userId,
-            @PathVariable Long reviewId
+            @RequestBody ReviewDeleteResponseDto request
     ) {
-        reviewService.deleteReviewByIdAndUserId(reviewId, userId);
+        reviewService.deleteReviewByIdAndUserId(request, userId);
         return ResponseEntity.ok(null);
     }
 }
