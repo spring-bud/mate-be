@@ -63,6 +63,12 @@ public class Review extends BaseTimeEntity {
         }
     }
 
+    public void isDeleteOwnerOrThrow(Long userId, Long productOwnerId) {
+        if (!user.getId().equals(userId) && !product.getUser().getId().equals(productOwnerId)) {
+            throw new ReviewException(ReviewExceptionType.NO_PERMISSIONS_ON_REVIEW);
+        }
+    }
+
     public void softDelete() {
         this.status = ReviewStatus.DELETED;
     }
