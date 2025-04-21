@@ -58,7 +58,7 @@ public class ProductController {
         return ResponseEntity.ok(new ApiResponse<>(productSearchService.getProductByTagName(tagName)));
     }
 
-    @PostMapping("/mostTag")
+    @GetMapping("/mostTag")
     public ResponseEntity<ApiResponse<List<ProductMostTagRequestDto>>> getMostTag(
     ) {
         return ResponseEntity.ok(new ApiResponse<>(productSearchService.getMostTag()));
