@@ -8,7 +8,6 @@ import com.example.mate.product.domain.repository.ProductRepository;
 import com.example.mate.product.domain.repository.ProductSrchRepository;
 import com.example.mate.review.application.ReviewService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -109,7 +108,7 @@ public class ProductSearchService {
 
         AtomicLong myVar = new AtomicLong(userId);
 
-        Page<Product> findProducts = productSrchRepository.findWithUserAndTags(request, pageable);
+        List<Product> findProducts = productSrchRepository.findWithUserAndTags(request);
 
         List<ProductAllResponseDto> productAll = findProducts.stream()
                 .map(product -> {
@@ -139,7 +138,11 @@ public class ProductSearchService {
                 })
                 .collect(Collectors.toList());
 
-        return new ProductPageResponseDto(productAll, findProducts.getNumber(), findProducts.hasNext());
+        int start = request.page() * request.size();
+        int end = Math.min(start + request.size(), productAll.size());
+        List<ProductAllResponseDto> pagedList = productAll.subList(start, end);
+
+        return new ProductPageResponseDto(pagedList, request.page(), end < productAll.size());
     }
 
     @Transactional
