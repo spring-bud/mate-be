@@ -60,7 +60,7 @@ public class ProductSearchService {
     }
 
     @Transactional
-    public List<ProductAllResponseDto> getProductByUserId(
+    public List<ProductUserResponseDto> getProductByUserId(
             Long userId,
             String accessToken
     ) {
@@ -78,15 +78,14 @@ public class ProductSearchService {
 
         List<Product> findProducts = productRepository.findByUserId(userId);
 
-        List<ProductAllResponseDto> productAll = findProducts.stream()
+        List<ProductUserResponseDto> productAll = findProducts.stream()
                 .map(product -> {
                     ProductLikeReviewDto likeReviewInfo = likeReviewInfo(product.getId());
                     boolean likeStatus = likeService.getLikeStatus(product.getId(), myVar.get());
-                    return ProductAllResponseDto.of(
+                    return ProductUserResponseDto.of(
                             product,
                             likeReviewInfo.likeCount(),
-                            likeReviewInfo.reviewCount(),
-                            likeStatus
+                            likeReviewInfo.reviewCount()
                     );
                 })
                 .collect(Collectors.toList());
@@ -136,7 +135,7 @@ public class ProductSearchService {
                         // reviewCount 기준으로 정렬
                         return dto2.createdAt().compareTo(dto1.createdAt()); // 내림차순
                     }
-                    return 0; // 기본값 (정렬 기준이 없을 경우)
+                    return dto2.createdAt().compareTo(dto1.createdAt()); // 기본값 (정렬 기준이 없을 경우)
                 })
                 .collect(Collectors.toList());
 
