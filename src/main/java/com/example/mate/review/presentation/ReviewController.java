@@ -65,6 +65,6 @@ public class ReviewController {
             @RequestBody ReviewDeleteResponseDto request
     ) {
         reviewService.deleteReviewByIdAndUserId(request, userId);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.noContent().build();
     }
 }
