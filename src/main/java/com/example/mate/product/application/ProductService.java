@@ -2,6 +2,7 @@ package com.example.mate.product.application;
 
 import com.example.mate.product.application.dto.ProductCreateRequestDto;
 import com.example.mate.product.application.dto.ProductIdResponseDto;
+import com.example.mate.product.application.dto.ProductUpdateRequestDto;
 import com.example.mate.product.domain.Product;
 import com.example.mate.product.domain.Tag;
 import com.example.mate.product.domain.repository.ProductRepository;
@@ -48,6 +49,29 @@ public class ProductService {
         Product savedProduct = productRepository.save(newProduct);
 
         return new ProductIdResponseDto(savedProduct.getId());
+    }
+
+    @Transactional
+    public ProductUpdateRequestDto updateProduct(Long userId, Long productId, ProductCreateRequestDto request) {
+
+        Product findProduct = findProductById(productId);
+
+        findProduct.isOwnerOrThrow(userId);
+
+        findProduct.updateProductInfoAll(
+                request.title(),
+                request.category(),
+                request.content(),
+                request.thumbnailUrl()
+        );
+
+        List<Tag> tags = tagService.findOrCreateTags(request.tags());
+
+        findProduct.syncTag(tags);
+
+        Product savedProduct = productRepository.save(findProduct);
+
+        return ProductUpdateRequestDto.of(savedProduct);
     }
 
     // External Service
