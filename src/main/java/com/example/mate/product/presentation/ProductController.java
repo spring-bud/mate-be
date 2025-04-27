@@ -35,6 +35,17 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(productIdResponse));
     }
 
+    @PatchMapping("{productId}")
+    public ResponseEntity<ApiResponse<ProductUpdateRequestDto>> updateProduct(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable Long productId,
+            @RequestBody ProductCreateRequestDto request
+    ) {
+        return ResponseEntity.ok(new ApiResponse<>(
+                productService.updateProduct(userId, productId, request)
+        ));
+    }
+
     @PostMapping("/srch")
     public ResponseEntity<ApiResponse<ProductPageResponseDto>> getProducts(
             @CookieValue(value = COOKIE_ACCESS_TOKEN, required = false) String accessToken,
