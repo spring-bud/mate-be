@@ -50,7 +50,7 @@ public class UserController {
             @RequestBody UserWithdrawRequestDto request
     ) {
         userService.deleteUser(userId, request);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/reasontype")

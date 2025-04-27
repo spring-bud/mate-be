@@ -89,6 +89,6 @@ public class ProductController {
             @PathVariable Long productId
     ) {
         productService.deleteProduct(userId, productId);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.noContent().build();
     }
 }
