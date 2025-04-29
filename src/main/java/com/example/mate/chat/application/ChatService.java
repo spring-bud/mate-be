@@ -163,7 +163,7 @@ public class ChatService {
                     ChatUser chatUser = userInfos.get(chatMessage.getSenderId());
                     return ChatMessageInfoDto.of(chatMessage, chatUser);
                 })
-                .sorted(Comparator.comparing(ChatMessageInfoDto::createdAt))
+                .sorted(Comparator.comparing(ChatMessageInfoDto::createdAt).reversed())
                 .toList();
         return ChatMessageResponseDto.of(chatMessageInfoDtoList, hasNext);
     }
