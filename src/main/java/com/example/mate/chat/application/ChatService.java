@@ -76,9 +76,10 @@ public class ChatService {
         ChatMessageResponseDto responseDto = getRecentMessagesByRoomToken(roomToken);
         List<ChatMessageInfoDto> messages = responseDto.messages();
         String latestMessage = messages.get(0).message();
+        String createdAt = messages.get(0).createdAt();
 
         Long messageCount = chatReadRepository.countByRoomTokenAndSenderId(roomToken, otherUser);
-        ChatLastMessageAndCountDto dto = new ChatLastMessageAndCountDto(latestMessage, messageCount);
+        ChatLastMessageAndCountDto dto = new ChatLastMessageAndCountDto(latestMessage, messageCount, createdAt);
         chatMessageCountPublisher.execute(otherUser, roomToken, dto);
 
         List<ChatMessage> pagedChatMessageList = getPagedChatMessages(roomToken, cursorId, limit);

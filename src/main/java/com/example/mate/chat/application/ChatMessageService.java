@@ -48,10 +48,11 @@ public class ChatMessageService {
         ChatMessageResponseDto responseDto = chatService.getRecentMessagesByRoomToken(message.roomToken());
         List<ChatMessageInfoDto> messages = responseDto.messages();
         String latestMessage = messages.get(0).message();
+        String createdAt = messages.get(0).createdAt();
 
 
         Long messageCount = chatReadRepository.countByRoomTokenAndSenderId(message.roomToken(), userId);
-        ChatLastMessageAndCountDto dto = new ChatLastMessageAndCountDto(latestMessage, messageCount);
+        ChatLastMessageAndCountDto dto = new ChatLastMessageAndCountDto(latestMessage, messageCount, createdAt);
         if (recUserId != null) {
             chatMessageCountPublisher.execute(recUserId, messageInfoDto.roomToken(), dto);
         }
