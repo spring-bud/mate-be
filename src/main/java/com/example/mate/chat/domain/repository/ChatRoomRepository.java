@@ -22,8 +22,8 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     @Query("""
             SELECT cr FROM ChatRoom cr
             LEFT JOIN FETCH cr.product p
-            WHERE cr.user1Id = :userId
-              OR cr.user2Id = :userId
+            WHERE (cr.user1Id = :userId AND cr.user1Active = true)
+              OR (cr.user2Id = :userId AND cr.user2Active = true)
               AND p.status != 'DELETED'
             """)
     List<ChatRoom> findChatRoomListByUserId(Long userId);
@@ -39,7 +39,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     @Modifying
     @Query("""
             UPDATE ChatRoom cr
-             SET cr.user1Id = NULL
+             SET cr.user1Active = false
              WHERE cr.user1Id = :userId
               AND cr.roomToken = :roomToken
             """)
@@ -48,7 +48,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     @Modifying
     @Query("""
             UPDATE ChatRoom cr
-             SET cr.user2Id = NULL
+             SET cr.user2Active = false
              WHERE cr.user2Id = :userId
               AND cr.roomToken = :roomToken
             """)
