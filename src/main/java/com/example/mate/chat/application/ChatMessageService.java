@@ -1,8 +1,10 @@
 package com.example.mate.chat.application;
 
+import com.example.mate.chat.application.dto.ChatLastMessageAndCountDto;
 import com.example.mate.chat.application.dto.ChatMessageDto;
 import com.example.mate.chat.application.dto.ChatMessageInfoDto;
 import com.example.mate.chat.application.dto.ChatMessageInfoDto.EnterAndLeaveMessage;
+import com.example.mate.chat.application.dto.ChatMessageResponseDto;
 import com.example.mate.chat.domain.*;
 import com.example.mate.chat.domain.repository.ChatMessageRepository;
 import com.example.mate.chat.domain.repository.ChatReadRepository;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static com.example.mate.chat.domain.MessageType.*;
 import static com.example.mate.chat.exception.ChatExceptionType.INVALID_CHAT_USER_ID_EXCEPTION;
@@ -28,11 +31,31 @@ public class ChatMessageService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageEventPublisher messageEventPublisher;
     private final ChatMessageCountPublisher chatMessageCountPublisher;
+    private final ChatService chatService;
 
     public void sendChatMessage(Long userId, ChatMessageDto message) {
         ChatMessageInfoDto messageInfoDto = createAndSaveMessage(userId, message);
+
+        ChatRoom chatRoomInfo = chatRoomRepository.findChatRoomBytokenId(message.roomToken());
+
+        Long recUserId = -1L;
+        if (chatRoomInfo.getUser1Id() == userId) {
+            recUserId = chatRoomInfo.getUser2Id();
+        } else {
+            recUserId = chatRoomInfo.getUser1Id();
+        }
+
+        ChatMessageResponseDto responseDto = chatService.getRecentMessagesByRoomToken(message.roomToken());
+        List<ChatMessageInfoDto> messages = responseDto.messages();
+        String latestMessage = messages.get(0).message();
+
+
         Long messageCount = chatReadRepository.countByRoomTokenAndSenderId(message.roomToken(), userId);
-        chatMessageCountPublisher.execute(messageInfoDto.senderId(), messageInfoDto.roomToken(), messageCount);
+        ChatLastMessageAndCountDto dto = new ChatLastMessageAndCountDto(latestMessage, messageCount);
+        if (recUserId != null) {
+            chatMessageCountPublisher.execute(recUserId, messageInfoDto.roomToken(), dto);
+        }
+
         messageEventPublisher.execute(messageInfoDto);
     }
 
