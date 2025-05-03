@@ -1,9 +1,6 @@
 package com.example.mate.chat.application;
 
-import com.example.mate.chat.application.dto.ChatMessageInfoDto;
-import com.example.mate.chat.application.dto.ChatMessageResponseDto;
-import com.example.mate.chat.application.dto.ChatRoomListDto;
-import com.example.mate.chat.application.dto.ChatRoomTokenDto;
+import com.example.mate.chat.application.dto.*;
 import com.example.mate.chat.domain.ChatMessage;
 import com.example.mate.chat.domain.ChatRoom;
 import com.example.mate.chat.domain.ChatUser;
@@ -67,7 +64,6 @@ public class ChatService {
     }
 
     public ChatMessageResponseDto getMessagesByRoomToken(String roomToken, Long userId, ObjectId cursorId, int limit) {
-        chatReadRepository.deleteByRoomToken(roomToken);
         ChatRoom chatRoomInfo = chatRoomRepository.findChatRoomBytokenId(roomToken);
         Long otherUser;
         if (userId == chatRoomInfo.getUser1Id()) {
@@ -75,8 +71,15 @@ public class ChatService {
         } else {
             otherUser = chatRoomInfo.getUser1Id();
         }
+        chatReadRepository.deleteByRoomTokenAndSenderId(roomToken, otherUser);
+
+        ChatMessageResponseDto responseDto = getRecentMessagesByRoomToken(roomToken);
+        List<ChatMessageInfoDto> messages = responseDto.messages();
+        String latestMessage = messages.get(0).message();
+
         Long messageCount = chatReadRepository.countByRoomTokenAndSenderId(roomToken, otherUser);
-        chatMessageCountPublisher.execute(otherUser, roomToken, messageCount);
+        ChatLastMessageAndCountDto dto = new ChatLastMessageAndCountDto(latestMessage, messageCount);
+        chatMessageCountPublisher.execute(otherUser, roomToken, dto);
 
         List<ChatMessage> pagedChatMessageList = getPagedChatMessages(roomToken, cursorId, limit);
         boolean hasNext = checkHasNextPage(pagedChatMessageList, limit);
