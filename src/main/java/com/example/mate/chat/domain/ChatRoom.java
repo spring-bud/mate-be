@@ -35,10 +35,18 @@ public class ChatRoom extends BaseTimeEntity {
     @Column(name = "user2_id")
     private Long user2Id;
 
+    @Column(name = "user1_active")
+    private boolean user1Active;
+
+    @Column(name = "user2_active")
+    private boolean user2Active;
+
     public ChatRoom(Product product, Long custromerId) {
         this.product = product;
         this.roomToken = UUID.randomUUID().toString();
         this.user1Id = product.getUser().getId();
         this.user2Id = custromerId;
+        user1Active = true;
+        user2Active = true;
     }
 }
