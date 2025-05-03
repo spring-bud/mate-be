@@ -56,7 +56,7 @@ public class ChatService {
 
         ChatRoom findChatRoom = chatRoomRepository.findChatRoomByUser1UdAndUser2Id(product.getUser().getId(), custromerId, productId);
 
-        if (findChatRoom == null) {
+        if (findChatRoom == null || (findChatRoom.getUser1Active == false || findChatRoom.getUser2Active == false)) {
             eventPublisher.publishEvent(new ProductCreateEvent(product, custromerId));
 
             ChatRoom chatRoomToken = chatRoomRepository.findChatRoomByUser1UdAndUser2Id(product.getUser().getId(), custromerId, productId);
