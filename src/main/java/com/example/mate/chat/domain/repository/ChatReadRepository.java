@@ -7,5 +7,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface ChatReadRepository extends MongoRepository<ChatRead, ObjectId> {
     long countByRoomTokenAndSenderId(String roomToken, Long senderId);
 
-    void deleteByRoomToken(String roomToken);
+    void deleteByRoomTokenAndSenderId(String roomToken, Long senderId);
 }
