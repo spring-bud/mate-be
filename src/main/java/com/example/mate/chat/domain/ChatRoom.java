@@ -46,7 +46,7 @@ public class ChatRoom extends BaseTimeEntity {
         this.roomToken = UUID.randomUUID().toString();
         this.user1Id = product.getUser().getId();
         this.user2Id = custromerId;
-        user1Active = true;
-        user2Active = true;
+        this.user1Active = true;
+        this.user2Active = true;
     }
 }
