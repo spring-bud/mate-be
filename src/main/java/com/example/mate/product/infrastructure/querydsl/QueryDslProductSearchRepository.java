@@ -3,7 +3,9 @@ package com.example.mate.product.infrastructure.querydsl;
 import com.example.mate.product.application.dto.ProductSrchRequestDto;
 import com.example.mate.product.domain.Product;
 import com.example.mate.product.domain.ProductCategory;
+import com.example.mate.product.domain.ProductStatus;
 import com.example.mate.product.domain.repository.ProductSrchRepository;
+import com.example.mate.user.domain.UserStatus;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static com.example.mate.product.domain.QProduct.product;
+import static com.example.mate.user.domain.QUser.user;
 
 @Repository
 @RequiredArgsConstructor
@@ -21,10 +24,13 @@ public class QueryDslProductSearchRepository implements ProductSrchRepository {
     @Override
     public List<Product> findWithUserAndTags(ProductSrchRequestDto request) {
         return queryFactory.selectFrom(product)
+                .leftJoin(product.user, user).fetchJoin()
                 .where(
                         categoryYn(request.category()),
                         titleYn(request.title()),
-                        tagYn(request.tag())
+                        tagYn(request.tag()),
+                        user.status.ne(UserStatus.valueOf("DELETED")),
+                        product.status.ne(ProductStatus.valueOf("DELETED"))
                 )
                 .fetch();
     }
