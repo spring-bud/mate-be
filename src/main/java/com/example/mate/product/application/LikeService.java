@@ -110,11 +110,27 @@ public class LikeService {
         Map<Long, Long> entries = hashOperations.entries(productId);
         Set<Long> hashUserId = hashOperations.keys(productId);
 
-        Long keyUserId = hashUserId.iterator().next();
+        Object keyUserId = hashUserId.iterator().next();
 
-        long returnCount = entries.get(keyUserId);
+        Object value = entries.get(keyUserId);
+        long returnCount = 0L;
+
+        if (value instanceof Number) {
+            returnCount = ((Number) value).longValue();
+        } else if (value instanceof String) {
+            returnCount = Long.parseLong((String) value);
+        }
+
         if (!hashUserId.isEmpty()) {
-            for (Long key : hashUserId) {
+            for (Object keyObj : hashUserId) {
+                Long key;
+                if (keyObj instanceof Number) {
+                    key = ((Number) keyObj).longValue();
+                } else if (keyObj instanceof String) {
+                    key = Long.parseLong((String) keyObj);
+                } else {
+                    continue;
+                }
                 returnCount += (key > 0) ? 1 : -1;
             }
         }
@@ -129,9 +145,16 @@ public class LikeService {
             Map<Long, Long> entries = hashOperations.entries(productId);
             Set<Long> hashUserId = hashOperations.keys(productId);
 
-            Long keyUserId = hashUserId.iterator().next();
+            if (!hashUserId.isEmpty()) {
+                Long keyUserId = hashUserId.iterator().next();
+                Object value = entries.get(keyUserId);
 
-            likeCount = entries.get(keyUserId);
+                if (value instanceof Number) {
+                    likeCount = ((Number) value).longValue();
+                } else if (value instanceof String) {
+                    likeCount = Long.parseLong((String) value);
+                }
+            }
         }
         return likeCount;
     }
