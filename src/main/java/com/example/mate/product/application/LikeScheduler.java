@@ -31,10 +31,21 @@ public class LikeScheduler {
 
         if (!setProductId.isEmpty()) {
             for (Object productId : setProductId) {
-                HashOperations<String, Long, Long> hashOperations = redisTemplate.opsForHash();
-                Set<Long> hashUserIds = hashOperations.keys(String.valueOf(productId));
+                HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
+                Set<Object> hashUserIdObjects = hashOperations.keys(String.valueOf(productId));
                 Long longProductId = Long.valueOf(String.valueOf(productId));
-                for (Long userId : hashUserIds) {
+
+                for (Object userIdObj : hashUserIdObjects) {
+
+                    Long userId;
+                    if (userIdObj instanceof Number) {
+                        userId = ((Number) userIdObj).longValue();
+                    } else if (userIdObj instanceof String) {
+                        userId = Long.parseLong((String) userIdObj);
+                    } else {
+                        continue;
+                    }
+
                     User findUser = userService.getUserById(Math.abs(userId));
                     Product findProduct = productService.findProductById(longProductId);
 
@@ -43,7 +54,9 @@ public class LikeScheduler {
                         likeRepository.save(newLike);
                     } else {
                         Like newLike = likeService.getExistingLike(Math.abs(userId), longProductId);
-                        likeRepository.delete(newLike);
+                        if (newLike != null) { // null 체크 추가
+                            likeRepository.delete(newLike);
+                        }
                     }
                 }
                 redisTemplate.delete(String.valueOf(productId));
