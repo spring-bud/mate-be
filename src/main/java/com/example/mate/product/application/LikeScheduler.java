@@ -25,7 +25,7 @@ public class LikeScheduler {
     private final ProductService productService;
 
     @SchedulerLock(name = "syncLikeCountToDB", lockAtMostFor = "PT30S", lockAtLeastFor = "PT5S")
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 2000)
     public void syncLikeCountToDB() {
         Set<Object> setProductId = redisTemplate.opsForSet().members("productId");
 
