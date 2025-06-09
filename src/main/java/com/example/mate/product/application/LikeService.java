@@ -56,8 +56,11 @@ public class LikeService {
             SetOperations<String, Object> setProductId,
             Long likeCount
     ) {
-        Long userProductpLUS = hashOperations.get(productId, userId);
-        Long userProductMinus = hashOperations.get(productId, -userId);
+        Object userProductPlusObj = hashOperations.get(productId, userId);
+        Object userProductMinusObj = hashOperations.get(productId, -userId);
+
+        Long userProductpLUS = convertToLong(userProductPlusObj);
+        Long userProductMinus = convertToLong(userProductMinusObj);
 
         if (userProductpLUS == null && userProductMinus == null) {
             return handleNewRedis(userId, productId, hashOperations, setProductId, likeCount);
@@ -110,15 +113,17 @@ public class LikeService {
         Map<Long, Long> entries = hashOperations.entries(productId);
         Set<Long> hashUserId = hashOperations.keys(productId);
 
-        Object keyUserId = hashUserId.iterator().next();
-
-        Object value = entries.get(keyUserId);
         long returnCount = 0L;
 
-        if (value instanceof Number) {
-            returnCount = ((Number) value).longValue();
-        } else if (value instanceof String) {
-            returnCount = Long.parseLong((String) value);
+        if (!hashUserId.isEmpty()) {
+            Object keyUserId = hashUserId.iterator().next();
+            Object value = entries.get(keyUserId);
+
+            if (value instanceof Number) {
+                returnCount = ((Number) value).longValue();
+            } else if (value instanceof String) {
+                returnCount = Long.parseLong((String) value);
+            }
         }
 
         if (!hashUserId.isEmpty()) {
@@ -146,7 +151,7 @@ public class LikeService {
             Set<Long> hashUserId = hashOperations.keys(productId);
 
             if (!hashUserId.isEmpty()) {
-                Long keyUserId = hashUserId.iterator().next();
+                Object keyUserId = hashUserId.iterator().next();
                 Object value = entries.get(keyUserId);
 
                 if (value instanceof Number) {
@@ -177,6 +182,24 @@ public class LikeService {
 
     private Long getCountLike(Long findProductId) {
         return likeRepository.countLikeByProductId(findProductId);
+    }
+
+    private Long convertToLong(Object value) {
+        if (value == null) {
+            return null;
+        }
+
+        if (value instanceof Long) {
+            return (Long) value;
+        } else if (value instanceof Integer) {
+            return ((Integer) value).longValue();
+        } else if (value instanceof String) {
+            return Long.parseLong((String) value);
+        } else if (value instanceof Number) {
+            return ((Number) value).longValue();
+        }
+
+        return null;
     }
 
 
