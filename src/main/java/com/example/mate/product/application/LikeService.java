@@ -83,9 +83,9 @@ public class LikeService {
             hashOperations.put(productId, userId, likeCount);
         } else {
             hashOperations.put(productId, -userId, likeCount);
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
     private boolean handleExistingRedis(
@@ -101,9 +101,9 @@ public class LikeService {
         } else {
             hashOperations.delete(productId, -userId);
             setProductId.remove("productId", Long.parseLong(productId));
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
     private Long redisLikeCount(
