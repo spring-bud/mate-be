@@ -18,7 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.example.mate.chat.domain.MessageType.*;
+import static com.example.mate.chat.domain.MessageType.ENTER;
+import static com.example.mate.chat.domain.MessageType.LEAVE;
 import static com.example.mate.chat.exception.ChatExceptionType.INVALID_CHAT_USER_ID_EXCEPTION;
 
 @Service
@@ -83,7 +84,7 @@ public class ChatMessageService {
         ChatUser findUser = chatUserRepository.findByUserId(userId)
                 .orElseThrow(() -> new ChatException(INVALID_CHAT_USER_ID_EXCEPTION));
         ChatMessage chatMessage = ChatMessage.builder()
-                .type(TALK)
+                .type(message.type())
                 .roomToken(message.roomToken())
                 .senderId(userId)
                 .message(message.message())
