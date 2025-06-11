@@ -53,7 +53,7 @@ public class JwtExtractor implements TokenExtractor {
         throw new AuthException(INVALID_TOKEN_TYPE);
     }
 
-    private Claims parseClaim(String token) {
+    public Claims parseClaim(String token) {
         try {
             return jwtParser.parseClaimsJws(token)
                     .getBody();
