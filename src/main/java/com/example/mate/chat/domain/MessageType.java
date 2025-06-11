@@ -3,6 +3,7 @@ package com.example.mate.chat.domain;
 public enum MessageType {
     ENTER("%s 님이 입장하셨습니다."),
     TALK(""),
+    FILE(""),
     LEAVE("%s 님이 퇴장하셨습니다."),
     ;
 
