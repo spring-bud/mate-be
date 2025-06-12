@@ -54,12 +54,11 @@ public class ProductController {
         return ResponseEntity.ok(new ApiResponse<>(productSearchService.getProducts(accessToken, srchRequest)));
     }
 
-    @PostMapping("/like/srch")
-    public ResponseEntity<ApiResponse<ProductPageResponseDto>> getLikeProducts(
-            @AuthenticationPrincipal Long userId,
-            @RequestBody ProductSrchRequestDto srchRequest
+    @GetMapping("/like/srch")
+    public ResponseEntity<ApiResponse<ProductLikeSrchResponseDto>> getLikeProducts(
+            @AuthenticationPrincipal Long userId
     ) {
-        return ResponseEntity.ok(new ApiResponse<>(productSearchService.getLikeProducts(userId, srchRequest)));
+        return ResponseEntity.ok(new ApiResponse<>(productSearchService.getLikeProducts(userId)));
     }
 
     @GetMapping("/users/{userId}")

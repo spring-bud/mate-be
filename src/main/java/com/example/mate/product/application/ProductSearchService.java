@@ -149,14 +149,10 @@ public class ProductSearchService {
 
 
     @Transactional
-    public ProductPageResponseDto getLikeProducts(
-            Long userId,
-            ProductSrchRequestDto request
+    public ProductLikeSrchResponseDto getLikeProducts(
+            Long userId
     ) {
-        //TODO: 나중에 필요하면
-        Pageable pageable = PageRequest.of(request.page(), request.size());
-
-        List<Product> findProducts = likeProductSrchRepository.findLikeProducts(request, userId);
+        List<Product> findProducts = likeProductSrchRepository.findLikeProducts(userId);
 
         List<ProductAllResponseDto> productAll = findProducts.stream()
                 .map(product -> {
@@ -171,23 +167,10 @@ public class ProductSearchService {
                             likeStatus
                     );
                 })
-                .sorted((dto1, dto2) -> {
-                    if ("LIKE".equals(request.sort())) {
-                        // likeCount 기준으로 정렬
-                        return Long.compare(dto2.count().likeCount(), dto1.count().likeCount()); // 내림차순
-                    } else if ("CREATE".equals(request.sort())) {
-                        // reviewCount 기준으로 정렬
-                        return dto2.createdAt().compareTo(dto1.createdAt()); // 내림차순
-                    }
-                    return dto2.createdAt().compareTo(dto1.createdAt()); // 기본값 (정렬 기준이 없을 경우)
-                })
                 .collect(Collectors.toList());
 
-        int start = request.page() * request.size();
-        int end = Math.min(start + request.size(), productAll.size());
-        List<ProductAllResponseDto> pagedList = productAll.subList(start, end);
 
-        return new ProductPageResponseDto(pagedList, request.page(), end < productAll.size());
+        return new ProductLikeSrchResponseDto(productAll);
     }
 
     @Transactional
