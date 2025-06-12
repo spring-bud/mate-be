@@ -117,13 +117,13 @@ public class ChatService {
                     List<ChatMessageInfoDto> messages = responseDto.messages();
                     String latestMessage = "";
                     String createdAt = "";
+                    Long messageCount = 0L;
 
                     if (!messages.isEmpty()) {
                         latestMessage = messages.get(0).message();
                         createdAt = messages.get(0).createdAt();
+                        messageCount = chatReadRepository.countByRoomTokenAndSenderId(chatRoomInfo.getRoomToken(), otherUser);
                     }
-
-                    Long messageCount = chatReadRepository.countByRoomTokenAndSenderId(chatRoomInfo.getRoomToken(), userId);
 
                     ChatUser otherUserInfo = chatUserRepository.findByUserId(otherUser)
                             .orElseThrow(() -> new ChatException(INVALID_CHAT_USER_ID_EXCEPTION));
