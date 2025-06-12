@@ -12,9 +12,17 @@ public record ChatRoomListDto(
         String productThumbnailUrl,
         String productTitle,
         String otherUserNickName,
-        String otherUserProfileUrl
+        String otherUserProfileUrl,
+        String latestMessage,
+        String createdAt,
+        Long messageCount
 ) {
-    public static ChatRoomListDto of(ChatRoom chatRoom, ChatUser otherUser) {
+    public static ChatRoomListDto of(ChatRoom chatRoom,
+                                     ChatUser otherUser,
+                                     String latestMessage,
+                                     String createdAt,
+                                     Long messageCount
+    ) {
         return new ChatRoomListDto(
                 chatRoom.getId(),
                 chatRoom.getRoomToken(),
@@ -24,7 +32,10 @@ public record ChatRoomListDto(
                 chatRoom.getProduct().getThumbnailUrl(),
                 chatRoom.getProduct().getTitle(),
                 otherUser.getNickname(),
-                otherUser.getProfileUrl()
+                otherUser.getProfileUrl(),
+                latestMessage,
+                createdAt,
+                messageCount
         );
     }
 }
