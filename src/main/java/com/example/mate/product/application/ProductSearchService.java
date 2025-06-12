@@ -4,6 +4,7 @@ package com.example.mate.product.application;
 import com.example.mate.auth.infrastructure.jwt.JwtProvider;
 import com.example.mate.product.application.dto.*;
 import com.example.mate.product.domain.Product;
+import com.example.mate.product.domain.repository.LikeProductSrchRepository;
 import com.example.mate.product.domain.repository.ProductRepository;
 import com.example.mate.product.domain.repository.ProductSrchRepository;
 import com.example.mate.review.application.ReviewService;
@@ -27,6 +28,7 @@ public class ProductSearchService {
     private final ProductRepository productRepository;
     private final JwtProvider jwtProvider;
     private final ProductSrchRepository productSrchRepository;
+    private final LikeProductSrchRepository likeProductSrchRepository;
 
 
     @Transactional
@@ -118,6 +120,49 @@ public class ProductSearchService {
                     if (myVar.get() != -1) {
                         likeStatus = likeService.getLikeStatus(product.getId(), myVar.get());
                     }
+
+                    return ProductAllResponseDto.of(
+                            product,
+                            likeReviewInfo.likeCount(),
+                            likeReviewInfo.reviewCount(),
+                            likeStatus
+                    );
+                })
+                .sorted((dto1, dto2) -> {
+                    if ("LIKE".equals(request.sort())) {
+                        // likeCount 기준으로 정렬
+                        return Long.compare(dto2.count().likeCount(), dto1.count().likeCount()); // 내림차순
+                    } else if ("CREATE".equals(request.sort())) {
+                        // reviewCount 기준으로 정렬
+                        return dto2.createdAt().compareTo(dto1.createdAt()); // 내림차순
+                    }
+                    return dto2.createdAt().compareTo(dto1.createdAt()); // 기본값 (정렬 기준이 없을 경우)
+                })
+                .collect(Collectors.toList());
+
+        int start = request.page() * request.size();
+        int end = Math.min(start + request.size(), productAll.size());
+        List<ProductAllResponseDto> pagedList = productAll.subList(start, end);
+
+        return new ProductPageResponseDto(pagedList, request.page(), end < productAll.size());
+    }
+
+
+    @Transactional
+    public ProductPageResponseDto getLikeProducts(
+            Long userId,
+            ProductSrchRequestDto request
+    ) {
+        //TODO: 나중에 필요하면
+        Pageable pageable = PageRequest.of(request.page(), request.size());
+
+        List<Product> findProducts = likeProductSrchRepository.findLikeProducts(request, userId);
+
+        List<ProductAllResponseDto> productAll = findProducts.stream()
+                .map(product -> {
+                    ProductLikeReviewDto likeReviewInfo = likeReviewInfo(product.getId());
+
+                    boolean likeStatus = likeService.getLikeStatus(product.getId(), userId);
 
                     return ProductAllResponseDto.of(
                             product,
