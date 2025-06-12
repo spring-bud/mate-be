@@ -113,12 +113,21 @@ public class ChatService {
                         otherUser = chatRoomInfo.getUser1Id();
                     }
 
+                    ChatMessageResponseDto responseDto = getRecentMessagesByRoomToken(chatRoomInfo.getRoomToken());
+                    List<ChatMessageInfoDto> messages = responseDto.messages();
+                    String latestMessage = messages.get(0).message();
+                    String createdAt = messages.get(0).createdAt();
+                    Long messageCount = chatReadRepository.countByRoomTokenAndSenderId(chatRoomInfo.getRoomToken(), userId);
+
                     ChatUser otherUserInfo = chatUserRepository.findByUserId(otherUser)
                             .orElseThrow(() -> new ChatException(INVALID_CHAT_USER_ID_EXCEPTION));
 
                     return ChatRoomListDto.of(
                             chatRoomInfo,
-                            otherUserInfo
+                            otherUserInfo,
+                            latestMessage,
+                            createdAt,
+                            messageCount
                     );
                 })
                 .collect(Collectors.toList());
