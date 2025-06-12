@@ -115,8 +115,14 @@ public class ChatService {
 
                     ChatMessageResponseDto responseDto = getRecentMessagesByRoomToken(chatRoomInfo.getRoomToken());
                     List<ChatMessageInfoDto> messages = responseDto.messages();
-                    String latestMessage = messages.get(0).message();
-                    String createdAt = messages.get(0).createdAt();
+                    String latestMessage = "";
+                    String createdAt = "";
+
+                    if (!messages.isEmpty()) {
+                        latestMessage = messages.get(0).message();
+                        createdAt = messages.get(0).createdAt();
+                    }
+
                     Long messageCount = chatReadRepository.countByRoomTokenAndSenderId(chatRoomInfo.getRoomToken(), userId);
 
                     ChatUser otherUserInfo = chatUserRepository.findByUserId(otherUser)
