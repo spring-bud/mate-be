@@ -54,6 +54,14 @@ public class ProductController {
         return ResponseEntity.ok(new ApiResponse<>(productSearchService.getProducts(accessToken, srchRequest)));
     }
 
+    @PostMapping("/like/srch")
+    public ResponseEntity<ApiResponse<ProductPageResponseDto>> getLikeProducts(
+            @AuthenticationPrincipal Long userId,
+            @RequestBody ProductSrchRequestDto srchRequest
+    ) {
+        return ResponseEntity.ok(new ApiResponse<>(productSearchService.getLikeProducts(userId, srchRequest)));
+    }
+
     @GetMapping("/users/{userId}")
     public ResponseEntity<ApiResponse<List<ProductUserResponseDto>>> getProductsByUserID(
             @CookieValue(value = COOKIE_ACCESS_TOKEN, required = false) String accessToken,
