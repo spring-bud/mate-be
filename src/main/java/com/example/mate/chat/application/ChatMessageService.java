@@ -78,6 +78,13 @@ public class ChatMessageService {
         String formattedMessage = formatEnterLeaveMessage(message.type(), findUser.getNickname());
         EnterAndLeaveMessage messageInfoDto = createEnterLeaveMessage(message, formattedMessage);
         messageEventPublisher.execute(messageInfoDto);
+
+//        ChatRoom changeChatRoomInfo = chatRoomRepository.findChatRoomBytokenId(message.roomToken());
+//        if(changeChatRoomInfo.isUser1Active() == false && changeChatRoomInfo.isUser2Active() == false){
+//            chatReadRepository.deleteByRoomToken(message.roomToken());
+//            chatMessageRepository.deleteByRoomToken(message.roomToken());
+//            chatRoomRepository.deleteByRoomToken(message.roomToken());
+//        }
     }
 
     public ChatMessageInfoDto createAndSaveMessage(Long userId, ChatMessageDto message) {
@@ -95,7 +102,11 @@ public class ChatMessageService {
                 .messageId(savedChatMessage.getId())
                 .senderId(userId)
                 .build();
-        chatReadRepository.save(chatRead);
+
+        ChatRoom chatRoomInfo = chatRoomRepository.findChatRoomBytokenId(message.roomToken());
+        if(chatRoomInfo.isUser1Active() == true && chatRoomInfo.isUser2Active() == true){
+            chatReadRepository.save(chatRead);
+        }
         return ChatMessageInfoDto.of(savedChatMessage, findUser);
     }
 
