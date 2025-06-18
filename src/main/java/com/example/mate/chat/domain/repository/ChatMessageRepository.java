@@ -15,4 +15,6 @@ public interface ChatMessageRepository extends MongoRepository<ChatMessage, Obje
     Slice<ChatMessage> findByRoomToken(String roomToken, Pageable pageable);
 
     Slice<ChatMessage> findByRoomTokenAndIdLessThan(String roomToken, ObjectId cursorId, Pageable pageable);
+
+    void deleteByRoomToken(String roomToken);
 }
