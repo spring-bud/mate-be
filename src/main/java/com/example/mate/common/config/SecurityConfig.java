@@ -80,6 +80,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/products/tagName").permitAll()
                         .requestMatchers("/api/v1/products/mostTag").permitAll()
                         .requestMatchers("/api/v1/users/popularity").permitAll()
+                        .requestMatchers("/api/v1/proposals/shared/{proposalId}").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
@@ -123,7 +124,9 @@ public class SecurityConfig {
                         new AntPathRequestMatcher("/api/v1/products", "GET"),
                         new AntPathRequestMatcher("/api/v1/products/tagName", "POST"),
                         new AntPathRequestMatcher("/api/v1/products/mostTag", "GET"),
-                        new AntPathRequestMatcher("/api/v1/users/popularity", "GET")
+                        new AntPathRequestMatcher("/api/v1/users/popularity", "GET"),
+                        new AntPathRequestMatcher("/api/v1/proposals/shared/{proposalId}")
+
                 )
         );
     }
