@@ -1,6 +1,8 @@
 package com.example.mate.proposal.application;
 
+import com.example.mate.proposal.application.dto.ProposalHtmlDto;
 import com.example.mate.proposal.application.dto.ProposalResponseDto;
+import com.example.mate.proposal.application.dto.ProposalShareDto;
 import com.example.mate.proposal.domain.Proposal;
 import com.example.mate.proposal.domain.repository.ProposalRepository;
 import com.example.mate.proposal.exception.ProposalException;
@@ -68,6 +70,29 @@ public class ProposalService {
         Proposal findProposal = findByIdAndUserId(proposalId, userId);
 
         proposalRepository.delete(findProposal);
+    }
+
+    public ProposalShareDto getProposalShareContent(Long proposalId, Long userId) {
+
+        ProposalHtmlDto proposal = getProposalHtmlContent(proposalId, userId);
+
+        String shareUrl = "http://localhost:8080/api/v1/proposals/shared/" + proposal.id();
+
+        return  ProposalShareDto.of(
+                proposal,
+                userId,
+                shareUrl
+        );
+    }
+
+    private ProposalHtmlDto getProposalHtmlContent(Long proposalId, Long userId) {
+        Proposal findProposal = findByIdAndUserId(proposalId, userId);
+
+        return new ProposalHtmlDto(
+                findProposal.getId(),
+                findProposal.getTitle(),
+                findProposal.getDescription()
+        );
     }
 
     private Proposal findByIdAndUserId(Long proposalId, Long userId) {

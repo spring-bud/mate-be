@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">제안서 보기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Header Navigation */
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #64b5f6;
+        }
+
+        .logo::before {
+            content: "🎯";
+            font-size: 1.8rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #64b5f6;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .proposal-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .proposal-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .proposal-subtitle {
+            font-size: 1.1rem;
+            color: #b0bec5;
+            font-weight: 400;
+        }
+
+        /* Content Area */
+        .proposal-content {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .proposal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(100, 181, 246, 0.5), transparent);
+        }
+
+        /* Content Styling */
+        .proposal-content h1,
+        .proposal-content h2,
+        .proposal-content h3,
+        .proposal-content h4,
+        .proposal-content h5,
+        .proposal-content h6 {
+            color: #64b5f6;
+            margin: 2rem 0 1rem 0;
+            font-weight: 600;
+        }
+
+        .proposal-content h1 { font-size: 2rem; }
+        .proposal-content h2 { font-size: 1.7rem; }
+        .proposal-content h3 { font-size: 1.4rem; }
+
+        .proposal-content p {
+            margin-bottom: 1.5rem;
+            color: #e3f2fd;
+            font-size: 1.1rem;
+        }
+
+        .proposal-content ul,
+        .proposal-content ol {
+            margin: 1.5rem 0;
+            padding-left: 2rem;
+            color: #e3f2fd;
+        }
+
+        .proposal-content li {
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .proposal-content blockquote {
+            border-left: 4px solid #64b5f6;
+            background: rgba(100, 181, 246, 0.1);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 10px 10px 0;
+            font-style: italic;
+        }
+
+        .proposal-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .proposal-content th,
+        .proposal-content td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .proposal-content th {
+            background: rgba(100, 181, 246, 0.2);
+            font-weight: 600;
+            color: #64b5f6;
+        }
+
+        .proposal-content code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.2rem 0.5rem;
+            border-radius: 5px;
+            font-family: 'Fira Code', monospace;
+            color: #81c784;
+        }
+
+        .proposal-content pre {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1.5rem;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .proposal-content pre code {
+            background: none;
+            padding: 0;
+        }
+
+        /* 이미지 스타일링 */
+        .proposal-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .proposal-content img:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        /* 이미지 캡션 스타일링 */
+        .proposal-content figure {
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .proposal-content figcaption {
+            margin-top: 0.8rem;
+            font-size: 0.9rem;
+            color: #90a4ae;
+            font-style: italic;
+        }
+
+        /* 인라인 이미지 처리 */
+        .proposal-content p img {
+            display: inline-block;
+            vertical-align: middle;
+            margin: 0.5rem;
+        }
+
+        /* 큰 이미지는 중앙 정렬 */
+        .proposal-content img[width*="100%"],
+        .proposal-content img[style*="width: 100%"],
+        .proposal-content img[style*="width:100%"] {
+            display: block;
+            margin: 2rem auto;
+        }
+
+        /* 갤러리 형태의 이미지들 */
+        .proposal-content .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .proposal-content .image-gallery img {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+        }
+
+        /* 이미지와 텍스트 혼합 레이아웃 */
+        .proposal-content .content-with-image {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+            margin: 2rem 0;
+        }
+
+        .proposal-content .content-with-image img {
+            flex: 0 0 40%;
+            margin: 0;
+        }
+
+        .proposal-content .content-with-image .text-content {
+            flex: 1;
+        }
+
+        /* 모바일에서 이미지 최적화 */
+        @media (max-width: 768px) {
+            .proposal-content .content-with-image {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .proposal-content .content-with-image img {
+                flex: none;
+                width: 100%;
+            }
+
+            .proposal-content .image-gallery {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #78909c;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 4rem;
+        }
+
+        .footer p {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .container {
+                padding: 2rem 1rem;
+            }
+
+            .proposal-title {
+                font-size: 2rem;
+            }
+
+            .proposal-content {
+                padding: 2rem;
+            }
+
+            .proposal-content h1 { font-size: 1.7rem; }
+            .proposal-content h2 { font-size: 1.4rem; }
+            .proposal-content h3 { font-size: 1.2rem; }
+        }
+
+        /* Animation */
+        .proposal-content {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(100, 181, 246, 0.5);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(100, 181, 246, 0.7);
+        }
+    </style>
+</head>
+<body>
+<!-- Header Navigation -->
+<header class="header">
+    <div class="nav-container">
+        <div class="logo">MATE</div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="#" onclick="history.back()">← 뒤로가기</a></li>
+                <li><a href="/">홈</a></li>
+                <li><a href="#">프로젝트</a></li>
+                <li><a href="#">채팅</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="container">
+    <div class="proposal-header">
+        <h1 class="proposal-title" th:text="${title}">제안서 제목</h1>
+        <p class="proposal-subtitle">프리랜서를 위한 허브, 쉽고 빠른 매칭!</p>
+    </div>
+
+    <div class="proposal-content">
+        <!-- 여기에 실제 제안서 내용(htmlContent)이 삽입됩니다 -->
+        <div th:utext="${htmlContent}">
+            <!-- 기본 내용 (htmlContent가 없을 때만 표시) -->
+            <h2>프로젝트 개요</h2>
+            <p>이곳에 제안서의 실제 내용이 표시됩니다. HTML 형태로 저장된 내용이 그대로 렌더링됩니다.</p>
+
+            <h3>주요 기능</h3>
+            <ul>
+                <li>사용자 친화적인 인터페이스</li>
+                <li>빠른 매칭 시스템</li>
+                <li>실시간 채팅 기능</li>
+            </ul>
+
+            <blockquote>
+                "혁신적인 과정, 어떤 수수료도 없이 빠르게 매칭이 가능해요!"
+            </blockquote>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>© 2025 MATE. 모든 수수료 없이, 쉽고 빠른 매칭!</p>
+    <p>이 제안서는 MATE 플랫폼을 통해 생성되었습니다.</p>
+</footer>
+</body>
+</html>

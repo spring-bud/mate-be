@@ -2,11 +2,16 @@ package com.example.mate.proposal.presentation;
 
 import com.example.mate.common.response.ApiResponse;
 import com.example.mate.proposal.application.ProposalService;
+import com.example.mate.proposal.application.dto.ProposalCreateUserDto;
+import com.example.mate.proposal.application.dto.ProposalHtmlDto;
 import com.example.mate.proposal.application.dto.ProposalResponseDto;
+import com.example.mate.proposal.application.dto.ProposalShareDto;
+import com.example.mate.proposal.domain.Proposal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -64,5 +69,15 @@ public class ProposalController {
     ) {
         proposalService.deleteProposalByIdAndUserId(userId, proposalId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("share/{proposalId}")
+    public ResponseEntity<ProposalShareDto> shareProposal(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable Long proposalId
+    ) {
+        ProposalShareDto response = proposalService.getProposalShareContent(proposalId, userId);
+
+        return ResponseEntity.ok(response);
     }
 }
