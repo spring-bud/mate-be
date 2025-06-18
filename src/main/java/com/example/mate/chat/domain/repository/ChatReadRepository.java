@@ -8,4 +8,6 @@ public interface ChatReadRepository extends MongoRepository<ChatRead, ObjectId> 
     long countByRoomTokenAndSenderId(String roomToken, Long senderId);
 
     void deleteByRoomTokenAndSenderId(String roomToken, Long senderId);
+
+    void deleteByRoomToken(String roomToken);
 }
