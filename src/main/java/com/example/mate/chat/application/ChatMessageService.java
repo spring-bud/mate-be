@@ -54,7 +54,7 @@ public class ChatMessageService {
 
         Long messageCount = chatReadRepository.countByRoomTokenAndSenderId(message.roomToken(), userId);
         ChatLastMessageAndCountDto dto = new ChatLastMessageAndCountDto(latestMessage, messageCount, createdAt);
-        if (recUserId != null) {
+        if (chatRoomInfo.isUser1Active() == true && chatRoomInfo.isUser2Active() == true) {
             chatMessageCountPublisher.execute(recUserId, messageInfoDto.roomToken(), dto);
         }
 
@@ -96,15 +96,18 @@ public class ChatMessageService {
                 .senderId(userId)
                 .message(message.message())
                 .build();
+
         ChatMessage savedChatMessage = chatMessageRepository.save(chatMessage);
-        ChatRead chatRead = ChatRead.builder()
-                .roomToken(message.roomToken())
-                .messageId(savedChatMessage.getId())
-                .senderId(userId)
-                .build();
 
         ChatRoom chatRoomInfo = chatRoomRepository.findChatRoomBytokenId(message.roomToken());
+
         if(chatRoomInfo.isUser1Active() == true && chatRoomInfo.isUser2Active() == true){
+            ChatRead chatRead = ChatRead.builder()
+                    .roomToken(message.roomToken())
+                    .messageId(savedChatMessage.getId())
+                    .senderId(userId)
+                    .build();
+
             chatReadRepository.save(chatRead);
         }
         return ChatMessageInfoDto.of(savedChatMessage, findUser);
