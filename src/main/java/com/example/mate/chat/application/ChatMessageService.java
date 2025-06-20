@@ -76,7 +76,16 @@ public class ChatMessageService {
             }
         }
         String formattedMessage = formatEnterLeaveMessage(message.type(), findUser.getNickname());
-        EnterAndLeaveMessage messageInfoDto = createEnterLeaveMessage(message, formattedMessage);
+
+        ChatMessageDto leaveMessage = ChatMessageDto.of(
+                formattedMessage,
+                message.type(),
+                message.roomToken()
+        );
+
+        ChatMessageInfoDto messageInfoDto = createAndSaveMessage(userId, leaveMessage);
+
+
         messageEventPublisher.execute(messageInfoDto);
 
 //        ChatRoom changeChatRoomInfo = chatRoomRepository.findChatRoomBytokenId(message.roomToken());
