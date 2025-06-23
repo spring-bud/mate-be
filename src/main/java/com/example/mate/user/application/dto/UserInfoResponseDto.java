@@ -16,7 +16,8 @@ public record UserInfoResponseDto(
         String contact,
         String githubUrl,
         String blogUrl,
-        List<UserStackInfo> userStacks
+        List<UserStackInfo> userStacks,
+        Boolean infoActive
 ) {
 
     public static UserInfoResponseDto of(User user) {
@@ -33,7 +34,8 @@ public record UserInfoResponseDto(
                 user.getBlogUrl(),
                 user.getUserStacks().stream()
                         .map(UserStackInfo::from)
-                        .toList()
+                        .toList(),
+                user.isInfoActive()
         );
     }
 
