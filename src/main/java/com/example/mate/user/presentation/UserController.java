@@ -1,6 +1,9 @@
 package com.example.mate.user.presentation;
 
 import com.example.mate.common.response.ApiResponse;
+import com.example.mate.product.application.dto.ProductPageResponseDto;
+import com.example.mate.product.application.dto.ProductSrchRequestDto;
+import com.example.mate.user.application.UserSearchService;
 import com.example.mate.user.application.UserService;
 import com.example.mate.user.application.dto.*;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +19,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final UserSearchService userSearchService;
 
     @GetMapping("/{userId}")
     public ResponseEntity<ApiResponse<UserInfoResponseDto>> getUserInfo(
@@ -24,6 +28,13 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse<>(
                 userService.getUserInfoWithId(userId)
         ));
+    }
+
+    @PostMapping("/freelanser/srch")
+    public ResponseEntity<ApiResponse<UserInfoPageResponseDto>> getFreeLanser(
+            @RequestBody UserSrchRequestDto srchRequest
+    ) {
+        return ResponseEntity.ok(new ApiResponse<>(userSearchService.getFreeLanser(srchRequest)));
     }
 
     @PatchMapping
