@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.example.mate.user.exception.UserExceptionType.NOT_EXIST_USER;
+import static com.example.mate.user.exception.UserExceptionType.NOT_FOUND_INFO;
 
 @Service
 @RequiredArgsConstructor
@@ -86,10 +87,20 @@ public class UserService {
                 request.email(),
                 request.contact(),
                 request.githubUrl(),
-                request.blogUrl()
+                request.blogUrl(),
+                request.infoActive()
         );
 
+
         List<Stack> stacks = stackService.findOrCreateStacks(request.user_stacks());
+
+        if ((request.jobType() == null || request.jobType().isEmpty()) ||
+                request.jobYear() == null ||
+                (request.contact() == null || request.contact().isEmpty()) ||
+                stacks.isEmpty()
+        ) {
+            throw new UserException(NOT_FOUND_INFO);
+        }
 
         findUser.syncStacks(stacks);
 
