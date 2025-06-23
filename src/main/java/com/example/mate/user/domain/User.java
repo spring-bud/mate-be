@@ -61,12 +61,16 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserStack> userStacks = new ArrayList<>();
 
+    @Column(name = "info_active", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean infoActive = false;
+
     @Builder
     public User(String kakaoId, String profileUrl) {
         this.kakaoId = kakaoId;
         this.profileUrl = profileUrl;
         this.nickname = DefaultNicknamePolicy.generatedRandomString();
         this.status = UserStatus.ACTIVE_FIRST_LOGIN;
+        this.infoActive = false;
     }
 
     public User(Long id, String kakaoId, String nickname, String profileUrl, UserStatus status) {
@@ -109,7 +113,8 @@ public class User extends BaseTimeEntity {
             String email,
             String contact,
             String githubUrl,
-            String blogUrl
+            String blogUrl,
+            Boolean infoActive
     ) {
         if (status.isFirstLogin()) {
             status = UserStatus.ACTIVE;
@@ -141,6 +146,10 @@ public class User extends BaseTimeEntity {
 
         if (blogUrl != null) {
             this.blogUrl = blogUrl;
+        }
+
+        if (infoActive != null) {
+            this.infoActive = infoActive;
         }
     }
 

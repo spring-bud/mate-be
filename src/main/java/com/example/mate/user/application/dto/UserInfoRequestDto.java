@@ -16,7 +16,8 @@ public record UserInfoRequestDto(
         String contact,
         String githubUrl,
         String blogUrl,
-        List<String> user_stacks
+        List<String> user_stacks,
+        boolean infoActive
 ) {
 }
 
