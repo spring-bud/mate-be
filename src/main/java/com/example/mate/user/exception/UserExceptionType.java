@@ -9,6 +9,7 @@ public enum UserExceptionType implements BaseExceptionType {
     DUPLICATE_NICKNAME("이미 사용 중인 닉네임입니다.", HttpStatus.CONFLICT),
     DUPLICATE_STACK("이미 추가된 기술스택입니다.", HttpStatus.BAD_REQUEST),
     NOT_MATCH_REASON_TYPE("일치하는 사유 타입이 없습니다.", HttpStatus.BAD_REQUEST),
+    NOT_FOUND_INFO("프리랜서 등록 활성화시 직업, 경력, 연락처, 기술 스택은 필수입니다.", HttpStatus.CONFLICT),
     ;
 
     private final String message;
