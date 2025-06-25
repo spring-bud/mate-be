@@ -30,11 +30,11 @@ public class UserController {
         ));
     }
 
-    @PostMapping("/freelanser/srch")
-    public ResponseEntity<ApiResponse<UserInfoPageResponseDto>> getFreeLanser(
+    @PostMapping("/freelancer/srch")
+    public ResponseEntity<ApiResponse<UserInfoPageResponseDto>> getFreeLancer(
             @RequestBody UserSrchRequestDto srchRequest
     ) {
-        return ResponseEntity.ok(new ApiResponse<>(userSearchService.getFreeLanser(srchRequest)));
+        return ResponseEntity.ok(new ApiResponse<>(userSearchService.getFreeLancer(srchRequest)));
     }
 
     @PatchMapping
