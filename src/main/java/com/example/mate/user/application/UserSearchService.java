@@ -32,7 +32,7 @@ public class UserSearchService {
     private final UserSrchRepository userSrchRepository;
 
     @Transactional
-    public UserInfoPageResponseDto getFreeLanser(
+    public UserInfoPageResponseDto getFreeLancer(
             UserSrchRequestDto request
     ) {
         //TODO: 나중에 필요하면
