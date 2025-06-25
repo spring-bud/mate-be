@@ -75,6 +75,10 @@ public class UserService {
         User findUser = userRepository.findByIdAndStatusIsNotDeleted(userId)
                 .orElseThrow(() -> new UserException(NOT_EXIST_USER));
 
+        List<Stack> stacks = stackService.findOrCreateStacks(request.user_stacks());
+
+        infoActiveCondition(request, findUser, stacks);
+
         findUser.updateUserInfoBasic(
                 request.nickname(),
                 request.profileUrl()
@@ -90,17 +94,6 @@ public class UserService {
                 request.blogUrl(),
                 request.infoActive()
         );
-
-
-        List<Stack> stacks = stackService.findOrCreateStacks(request.user_stacks());
-
-        if ((request.jobType() == null || request.jobType().isEmpty()) ||
-                request.jobYear() == null ||
-                (request.contact() == null || request.contact().isEmpty()) ||
-                stacks.isEmpty()
-        ) {
-            throw new UserException(NOT_FOUND_INFO);
-        }
 
         findUser.syncStacks(stacks);
 
@@ -146,5 +139,29 @@ public class UserService {
         return Arrays.stream(ReasonType.values())
                 .map(reasonType -> new ReasonTypeDto(reasonType.name(), reasonType.description()))
                 .collect(Collectors.toList());
+    }
+
+    private void infoActiveCondition(UserInfoRequestDto request, User findUser, List<Stack> stacks) {
+
+        if(!request.infoActive()) return;
+
+        String finalJobType = request.jobType() != null ? request.jobType() : findUser.getJobType();
+        Integer finalJobYear = request.jobYear() != null ? request.jobYear() : findUser.getJobYear();
+        String finalContact = request.contact() != null ? request.contact() : findUser.getContact();
+
+
+        boolean hasAllRequiredInfo =
+                isNotBlank(finalJobType) &&
+                        finalJobYear != null &&
+                        isNotBlank(finalContact) &&
+                        stacks != null && !stacks.isEmpty();
+
+        if (!hasAllRequiredInfo) {
+            throw new UserException(NOT_FOUND_INFO);
+        }
+    }
+
+    private boolean isNotBlank(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 }
